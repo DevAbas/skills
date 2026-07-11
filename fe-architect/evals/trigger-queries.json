@@ -1,0 +1,23 @@
+[
+  { "query": "Should I use SSR or CSR for my e-commerce site?", "should_trigger": true, "note": "rendering strategy decision" },
+  { "query": "whats the tradeoff between signals and redux", "should_trigger": true, "note": "state management tradeoff, informal phrasing" },
+  { "query": "We're building a dashboard with real-time data. How should we architect the frontend?", "should_trigger": true, "note": "cross-cutting system design (transport + state + perf)" },
+  { "query": "Review this component: is there an architecture issue with using `use client` on a data-fetching wrapper?", "should_trigger": true, "note": "code review for an architectural (RSC boundary) issue" },
+  { "query": "Help me prepare for a frontend system design interview", "should_trigger": true, "note": "interview framework" },
+  { "query": "micro-frontends vs a monorepo for a 40-engineer org: which way should we go?", "should_trigger": true, "note": "architecture & composition at scale" },
+  { "query": "where's the safest place to store our auth token on the frontend?", "should_trigger": true, "note": "security architecture decision" },
+  { "query": "is Tailwind or CSS-in-JS the better call for a Next.js App Router project?", "should_trigger": true, "note": "styling architecture decision (RSC-aware)" },
+  { "query": "our mobile LCP is stuck at 4 seconds, how should we approach fixing it?", "should_trigger": true, "note": "performance strategy, not a single code fix" },
+  { "query": "what caching strategy should we use across the CDN, HTML, and hashed assets?", "should_trigger": true, "note": "network/infra caching architecture" },
+
+  { "query": "Write a React component that fetches user data", "should_trigger": false, "note": "code generation, not an architecture decision" },
+  { "query": "Fix the TypeScript error on line 42", "should_trigger": false, "note": "debugging a specific error" },
+  { "query": "Convert this CSS to Tailwind classes", "should_trigger": false, "note": "mechanical styling conversion, not a styling-architecture choice" },
+  { "query": "Write unit tests for my login form", "should_trigger": false, "note": "test implementation, not testing strategy" },
+  { "query": "How do I deploy to Vercel?", "should_trigger": false, "note": "deployment steps, not a deployment-strategy decision" },
+  { "query": "Rename the `data` variable to `userData` everywhere in this file", "should_trigger": false, "note": "mechanical refactor" },
+  { "query": "What's the syntax for a useEffect cleanup function?", "should_trigger": false, "note": "API syntax lookup" },
+  { "query": "Add a dark mode toggle button to my navbar", "should_trigger": false, "note": "feature implementation, not a theming-architecture decision" },
+  { "query": "Why is my npm install failing with a peer dependency error?", "should_trigger": false, "note": "environment/dependency debugging" },
+  { "query": "Generate a regex that validates email addresses", "should_trigger": false, "note": "utility code generation" }
+]

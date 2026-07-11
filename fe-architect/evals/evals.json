@@ -1,0 +1,364 @@
+{
+  "skill_name": "fe-architect",
+  "description": "24 grounded architecture test cases, 2 per domain (one straightforward, one cross-cutting). Kind mix: 6 concept, 6 tradeoff, 4 when, 4 pitfall, 4 scenario. Every assertion is satisfiable from the references/ content.",
+  "evals": [
+    {
+      "id": 1,
+      "group": "ai-era-frontend",
+      "kind": "concept",
+      "prompt": "What is the difference between an MCP resource and an MCP tool, and when would I expose each to a coding agent?",
+      "expected_output": "A resource is read-only data the agent pulls on demand (a docs page, config file, file contents); a tool is a callable function the agent invokes to perform work (run a codemod, type-check, call an API). Resources provide context; tools perform actions. Both are discovered over JSON-RPC (resources/list, tools/list). Expose resources to ground the agent in current truth; expose tools for actions, and gate mutating tools behind consent.",
+      "assertions": [
+        "Defines a resource as read-only, on-demand context (docs/config/file contents)",
+        "Defines a tool as a callable action the agent invokes",
+        "States resources provide context while tools perform work",
+        "Mentions discovery via JSON-RPC (resources/list or tools/list) OR consent-gating for mutating tools",
+        "Flags the pitfall that exposing too many resources floods the agent's context window",
+        "References at least one related topic (e.g. mcp-tool-uis or framework-mcp-servers)"
+      ]
+    },
+    {
+      "id": 2,
+      "group": "ai-era-frontend",
+      "kind": "scenario",
+      "prompt": "We're building an AI chat product where the agent reads Figma design tokens and a framework's live docs over MCP, then writes code. How do we keep it both accurate and safe?",
+      "expected_output": "Feed structured context via MCP so the agent gets token names (not pixels) and current API references (not its training snapshot). Render a pending tool-call card showing tool name, server origin, and arguments. Gate mutating tool calls (write/delete/send) behind explicit human consent; let read-only tools run silently. Treat generated code as a first draft and review every diff. The human owns correctness; MCP design-to-code doesn't cover responsive, motion, empty states, or a11y. Scope work to bounded tasks and lean on types/tests/CI.",
+      "assertions": [
+        "Recommends feeding structured context (token names, live docs) via MCP rather than pixels/training data",
+        "Requires gating mutating/destructive tool calls behind human consent",
+        "States the human who commits owns correctness and must review every diff",
+        "Notes MCP design-to-code gaps (responsive, motion, empty states, accessibility)",
+        "Cross-references multiple related topics by name (design-to-code-mcp, framework-mcp-servers, ai-assisted-dev-workflow)"
+      ]
+    },
+    {
+      "id": 3,
+      "group": "rendering-hydration",
+      "kind": "pitfall",
+      "prompt": "In the Next.js App Router, what silently turns a route from static to dynamic, and why is doing it in a shared layout dangerous?",
+      "expected_output": "Reading request-time data (cookies(), headers(), searchParams, or setting dynamic='force-dynamic') opts the route into per-request rendering (SSR) instead of static optimization. In a shared layout this deopts every child route at once, quietly removing static/CDN benefits site-wide. Also remember params and searchParams are async Promises that must be awaited. Default to static and reach for dynamic only where the route genuinely reads request data.",
+      "assertions": [
+        "Identifies cookies()/headers()/searchParams (or force-dynamic) as the trigger",
+        "Explains it forces per-request SSR instead of static optimization",
+        "Explains a shared layout propagates the deopt to all child routes",
+        "Mentions params/searchParams are async and must be awaited",
+        "Gives the conditional fix (static-by-default; go dynamic only where request data is read)",
+        "References a related topic (e.g. streaming-ssr or rendering-strategies)"
+      ]
+    },
+    {
+      "id": 4,
+      "group": "rendering-hydration",
+      "kind": "when",
+      "prompt": "When should I use SSG vs ISR vs SSR vs CSR for a given page?",
+      "expected_output": "SSG for content identical for all users that changes only at deploy (docs, marketing): lowest latency, served from CDN. ISR for mostly-static content that changes between deploys (product pages, blogs) where bounded staleness is acceptable. SSR for per-request freshness or personalization that must still be crawlable. CSR for highly interactive, auth-gated views where first paint and SEO don't matter. Avoid SSG for per-user data, SSR for never-changing content, CSR for content pages needing SEO/LCP, and ISR when you need strict consistency.",
+      "assertions": [
+        "Recommends SSG for all-users, deploy-time-only content",
+        "Recommends ISR for mostly-static content tolerant of bounded staleness",
+        "Recommends SSR for per-request/personalized content that must be crawlable",
+        "Recommends CSR only for interactive, auth-gated, non-SEO views",
+        "States at least one explicit 'avoid' condition (e.g. SSG for per-user data, ISR for strict consistency)",
+        "Frames the choice on freshness/personalization axes rather than popularity"
+      ]
+    },
+    {
+      "id": 5,
+      "group": "performance-engineering",
+      "kind": "concept",
+      "prompt": "Why did INP replace FID as a Core Web Vital, and what does INP actually measure?",
+      "expected_output": "FID only measured input delay before the browser started handling the first interaction. INP measures the full input-to-next-paint latency (input delay + processing + presentation) across ALL interactions in the session, reported near the 98th percentile, with a good threshold of ≤200ms. It catches slow event handlers that FID missed, so a single janky handler can fail INP even when most interactions are fast.",
+      "assertions": [
+        "States FID only measured the delay before handling the first input",
+        "States INP measures full input-to-paint latency (delay + processing + presentation)",
+        "Notes INP aggregates across all interactions near the 98th percentile",
+        "Cites the ≤200ms good threshold",
+        "Flags that one slow handler can spike INP even if most interactions are fast",
+        "References a related topic (e.g. render-performance-patterns)"
+      ]
+    },
+    {
+      "id": 6,
+      "group": "performance-engineering",
+      "kind": "scenario",
+      "prompt": "An e-commerce product page fails LCP at 4s on mobile. Walk me through how you'd attack it across the bundle, image, and network layers.",
+      "expected_output": "Give the LCP hero image preload + fetchPriority=\"high\" and never loading=\"lazy\". Serve AVIF/WebP (30-50% smaller) with correct srcset/sizes so phones don't download a full-screen image. preconnect to image/font origins but don't preload so many assets they contend for bandwidth. Route-split and defer non-critical JS so render-blocking scripts don't delay the hero paint. Verify in field data (CrUX/RUM), not just Lighthouse, since the mobile LCP element and timing differ.",
+      "assertions": [
+        "Prioritizes the LCP image (preload + fetchPriority high, not lazy)",
+        "Recommends modern formats with responsive srcset/sizes for mobile",
+        "Includes a network-layer step (preconnect) and warns against over-preloading/bandwidth contention",
+        "Includes a bundle-layer step (route-split/defer render-blocking JS)",
+        "Says to confirm with field data (CrUX/RUM), not only lab/Lighthouse",
+        "Cross-references multiple related topics (core-web-vitals, network-performance, bundle-architecture-code-splitting)"
+      ]
+    },
+    {
+      "id": 7,
+      "group": "architecture-composition",
+      "kind": "pitfall",
+      "prompt": "In Module Federation, why must both the host and the remote declare React in `shared`, and what breaks if only one does?",
+      "expected_output": "Federation negotiates a single shared singleton of React across the boundary using both sides' declarations and requiredVersion ranges. If only one side declares it (or versions are incompatible), federation can't negotiate a singleton and loads two copies of React. Two React instances break hooks and context shared across the host/remote boundary, often silently. Both sides must declare the dep with matching version ranges and singleton: true.",
+      "assertions": [
+        "States federation negotiates one shared singleton instance of React",
+        "States that declaring on only one side (or version skew) loads two copies",
+        "Explains two React copies break hooks/context across the boundary",
+        "Notes the fix: both sides declare with matching version ranges / singleton",
+        "Identifies this as a silent failure mode",
+        "References the relevant topic (microfrontends-module-federation)"
+      ]
+    },
+    {
+      "id": 8,
+      "group": "architecture-composition",
+      "kind": "tradeoff",
+      "prompt": "At scale, when would you pick a monorepo with module boundaries over runtime micro-frontends with Module Federation?",
+      "expected_output": "Micro-frontends buy independent deploy cadences and team isolation but add runtime failure modes (version skew, cold-load waterfalls, per-remote CDN ops). A monorepo gives atomic cross-package refactors in one commit/CI run plus shared tooling and task caching. Choose micro-frontends only when teams genuinely need independent deploys and isolation; if sections change together or the team is small, monorepo module boundaries are simpler. Both risk a 'distributed monolith'. Enforce boundaries (Nx rules / explicit exports) either way.",
+      "assertions": [
+        "Names at least 2 micro-frontend pros (independent deploys, team isolation)",
+        "Names at least 2 micro-frontend cons (version skew, load waterfall, per-remote ops)",
+        "States the monorepo advantage of atomic cross-package refactors + shared caching",
+        "Recommends micro-frontends only under the condition of genuine independent-deploy needs",
+        "Warns about the 'distributed monolith' / boundary-enforcement risk",
+        "References both related topics (monorepos and microfrontends-module-federation)"
+      ]
+    },
+    {
+      "id": 9,
+      "group": "state-data",
+      "kind": "when",
+      "prompt": "When would you choose Server-Sent Events over a WebSocket for real-time data?",
+      "expected_output": "Use SSE when the server pushes to the client only (no client-to-server messages): it's HTTP-native, reuses existing infra, auto-reconnects with Last-Event-ID replay, and scales behind stateless servers with a pub-sub broker. Use a WebSocket when both sides push frequently (chat, collaborative editing, games), but it needs sticky sessions or a broker and heartbeats. Note HTTP/1.1 caps SSE at ~6 connections per origin per tab (lifted under HTTP/2).",
+      "assertions": [
+        "Recommends SSE for one-way server→client streaming",
+        "Cites SSE advantages (HTTP-native, auto-reconnect/Last-Event-ID, reuses infra)",
+        "Recommends WebSocket when bidirectional/high-frequency messaging is needed",
+        "Mentions a scaling constraint (sticky sessions/broker, or HTTP/1.1 6-connection cap)",
+        "Frames the decision on data-flow direction, with conditions",
+        "References a related topic (e.g. server-state-data-fetching)"
+      ]
+    },
+    {
+      "id": 10,
+      "group": "state-data",
+      "kind": "tradeoff",
+      "prompt": "REST vs GraphQL vs tRPC: how do I choose for a new product API?",
+      "expected_output": "REST: standard HTTP/CDN caching with zero extra tooling, consumable by any client/language, but it over/under-fetches and needs versioning discipline. GraphQL: clients request exactly the fields they need and fetch nested data in one round-trip, but it has N+1 problems (needs DataLoader) and POST queries bypass HTTP caching (persisted queries add setup). tRPC: end-to-end TypeScript types with no codegen, but it only works inside a shared TypeScript monorepo, no external consumers. Pick REST for public/non-TS clients and cacheable reads, GraphQL for diverse clients needing different field sets, tRPC for full-stack TS monorepos.",
+      "assertions": [
+        "States REST's caching/portability pro and over/under-fetch + versioning con",
+        "States GraphQL's field-selection pro and N+1 + caching-bypass con",
+        "States tRPC's end-to-end-types pro and monorepo/TS-only con",
+        "Gives a conditional recommendation per option (public clients / diverse clients / TS monorepo)",
+        "Flags a concrete pitfall (e.g. GraphQL N+1 needing DataLoader, or tRPC across repos)",
+        "References at least one related topic (e.g. server-state-data-fetching, backend-for-frontend, caching-strategies)"
+      ]
+    },
+    {
+      "id": 11,
+      "group": "network-infrastructure",
+      "kind": "concept",
+      "prompt": "What's the difference between `s-maxage` and `max-age` in Cache-Control, and how should I set each?",
+      "expected_output": "max-age sets the TTL for the browser's private cache; s-maxage sets the TTL for shared caches (CDNs) and overrides max-age for them (the browser ignores s-maxage). Setting both lets you control browser and CDN TTLs independently. Keep s-maxage short on HTML documents (or use stale-while-revalidate) so deploys take effect, and use a long max-age with immutable on content-hashed static assets.",
+      "assertions": [
+        "States s-maxage applies to shared caches (CDNs) and overrides max-age there",
+        "States max-age applies to the browser cache and the browser ignores s-maxage",
+        "Explains setting both controls browser vs CDN TTL independently",
+        "Recommends short TTL on HTML and long+immutable on hashed assets",
+        "Flags the deploy-time staleness pitfall of long-cached HTML referencing removed asset URLs",
+        "References a related topic (e.g. caching-strategies or edge-computing-rendering)"
+      ]
+    },
+    {
+      "id": 12,
+      "group": "network-infrastructure",
+      "kind": "when",
+      "prompt": "I need to ship a risky checkout change safely with instant rollback. When do I reach for blue-green vs canary vs feature flags?",
+      "expected_output": "Separate deploy (code on servers) from release (exposed to users). Blue-green flips 100% of traffic atomically with instant rollback but doubles compute and exposes everyone at once. Good for DB migrations or compliance freezes. Canary routes a small slice (e.g. 5%) first to limit blast radius and validate on real traffic before promoting. Feature flags gate the change in a single binary for percentage rollout and an instant kill-switch with no redeploy. CI/CD promotes the already-tested artifact; evaluate flags server-side to avoid flicker and delete flag debt after rollout.",
+      "assertions": [
+        "Distinguishes deploy from release",
+        "Describes blue-green (atomic 100% switch, instant rollback, double compute)",
+        "Describes canary (small percentage first, limited blast radius)",
+        "Describes feature flags (in-binary percentage rollout + kill-switch, no redeploy)",
+        "Gives a condition for each and mentions flag-debt cleanup or server-side evaluation",
+        "References related topics (e.g. load-balancing, ci-cd-frontend)"
+      ]
+    },
+    {
+      "id": 13,
+      "group": "styling-design-systems",
+      "kind": "tradeoff",
+      "prompt": "How should I choose between CSS Modules, CSS-in-JS, and Tailwind for a new app?",
+      "expected_output": "The axis is where the styling cost lands: build-time (CSS Modules, Tailwind, zero-runtime CSS-in-JS) vs runtime (styled-components/Emotion). CSS Modules: zero runtime, locally scoped, but static. Runtime CSS-in-JS: dynamic props-based styles but adds main-thread cost and breaks RSC/streaming SSR. Tailwind: utility-first, no runtime, small purged CSS, but verbose markup. Default to build-time (Tailwind/CSS Modules or zero-runtime like vanilla-extract) for RSC/SSR apps; reach for runtime CSS-in-JS only when you need heavy per-render dynamic styling.",
+      "assertions": [
+        "Frames the tradeoff as where the cost lands (build-time vs runtime)",
+        "States CSS Modules' zero-runtime/scoped pro and static con",
+        "States runtime CSS-in-JS's dynamic pro and main-thread/RSC con",
+        "States Tailwind's no-runtime/purge pro and verbose-markup con",
+        "Recommends build-time CSS by default for RSC/SSR with a stated condition",
+        "References at least one related topic (e.g. atomic-utility-first-css, design-tokens-theming)"
+      ]
+    },
+    {
+      "id": 14,
+      "group": "styling-design-systems",
+      "kind": "pitfall",
+      "prompt": "Why can't styled-components or Emotion be used directly in React Server Components, and which CSS strategies are RSC-compatible?",
+      "expected_output": "Runtime CSS-in-JS injects styles by calling DOM APIs (e.g. document.createElement('style')) at render time. Server Components run on the server with no DOM, so those calls fail. Wrapping every styled component in 'use client' works but defeats RSC's bundle-splitting goal. CSS Modules, zero-runtime CSS-in-JS (vanilla-extract, StyleX, Linaria), and Tailwind all compile to static CSS and are RSC-compatible.",
+      "assertions": [
+        "Explains runtime CSS-in-JS injects styles via DOM APIs at render",
+        "Explains Server Components have no DOM, so injection fails",
+        "Notes that wrapping everything in 'use client' defeats RSC's purpose",
+        "Lists RSC-compatible options (CSS Modules, zero-runtime CSS-in-JS, Tailwind)",
+        "References a related topic (e.g. atomic-utility-first-css or css-modules-vs-css-in-js-vs-tailwind)"
+      ]
+    },
+    {
+      "id": 15,
+      "group": "browser-runtime-internals",
+      "kind": "tradeoff",
+      "prompt": "Why prefer scheduler.yield() over setTimeout(0) when breaking up a long task?",
+      "expected_output": "scheduler.yield() re-queues the continuation at user-visible priority, so it resumes before lower-priority background tasks. setTimeout(0) joins the back of the task queue with no priority guarantee, so any queued task may run first. Trade-off: scheduler.yield() is Chromium + Firefox only, so Safari needs a setTimeout(0) fallback. Yield on a time-based ~50ms deadline so no single task crosses the long-task threshold; don't rely on isInputPending() as the heuristic.",
+      "assertions": [
+        "States scheduler.yield() resumes the continuation at user-visible priority",
+        "States setTimeout(0) goes to the back of the queue with no priority guarantee",
+        "Notes the browser-support tradeoff (Safari fallback to setTimeout)",
+        "Recommends a time-based (~50ms) yield deadline tied to the long-task threshold",
+        "Flags a pitfall (e.g. don't use isInputPending() as the yield heuristic)",
+        "References a related topic (e.g. event-loop-scheduler-yield or render-performance-patterns)"
+      ]
+    },
+    {
+      "id": 16,
+      "group": "browser-runtime-internals",
+      "kind": "concept",
+      "prompt": "Walk me through the browser rendering pipeline (Style → Layout → Paint → Composite) and what triggers a re-layout vs a repaint vs just a re-composite.",
+      "expected_output": "The pipeline runs Style (compute styles) → Layout (compute geometry/positions) → Paint (fill pixels into layers) → Composite (assemble layers on the GPU). Changing geometry (width, top, font-size) triggers Layout (reflow), then Paint and Composite. Changing visual-only properties (color, background) skips Layout but triggers Paint + Composite. Changing transform/opacity can be handled by the compositor alone, skipping Layout and Paint entirely, which is why you animate transform/opacity for smooth 60fps motion.",
+      "assertions": [
+        "Lists the four stages in order: Style, Layout, Paint, Composite",
+        "States geometry changes trigger Layout (reflow) and everything after",
+        "States color/visual-only changes skip Layout but still Paint",
+        "States transform/opacity can be composite-only (skipping Layout and Paint)",
+        "Draws the practical conclusion (animate transform/opacity for performance)",
+        "References a related topic (e.g. paint-composite-optimization)"
+      ]
+    },
+    {
+      "id": 17,
+      "group": "security",
+      "kind": "pitfall",
+      "prompt": "Where should a SPA store its auth token: localStorage, sessionStorage, or a cookie?",
+      "expected_output": "Not localStorage/sessionStorage. Both are readable by any JavaScript, so a single XSS exfiltrates every token. Store tokens in HttpOnly, Secure, SameSite cookies so script can't read them. HttpOnly cookies reintroduce CSRF risk, so pair them with SameSite plus a CSRF token / double-submit. Keep access tokens short-lived (5-15 min) with a refresh token in an HttpOnly cookie; a BFF can do the OAuth exchange server-side so the SPA never holds raw tokens. Remember JWTs can't be revoked before expiry without a blocklist.",
+      "assertions": [
+        "States localStorage/sessionStorage are readable by JS so XSS steals the token",
+        "Recommends HttpOnly + Secure + SameSite cookies",
+        "Notes cookies reintroduce CSRF, requiring SameSite + a CSRF token",
+        "Mentions short-lived access tokens / refresh tokens (or a BFF doing the exchange)",
+        "Frames it as a conditional defense, not an absolute, and cites the XSS threat model",
+        "References a related topic (e.g. xss-csrf-clickjacking)"
+      ]
+    },
+    {
+      "id": 18,
+      "group": "security",
+      "kind": "tradeoff",
+      "prompt": "Stateful server sessions vs stateless JWTs for auth: what are the tradeoffs?",
+      "expected_output": "Server sessions store state server-side (a session store) and reference it via an opaque cookie: easy to revoke instantly and small cookies, but require shared session storage and sticky sessions or a central store to scale. JWTs are stateless and self-contained. They scale horizontally with no lookup and carry claims, but can't be revoked before expiry without a blocklist (which reintroduces state), and bloat if overloaded with claims. Either way, keep the token in an HttpOnly cookie, keep lifetimes short, and verify signatures server-side.",
+      "assertions": [
+        "States sessions are server-side/revocable but need shared storage to scale",
+        "States JWTs are stateless/horizontally scalable but hard to revoke before expiry",
+        "Notes a blocklist reintroduces the state JWTs were meant to avoid",
+        "Gives a conditional recommendation (scale vs instant revocation needs)",
+        "Mentions storing the token in an HttpOnly cookie / verifying server-side",
+        "References a related topic (e.g. xss-csrf-clickjacking)"
+      ]
+    },
+    {
+      "id": 19,
+      "group": "quality-observability",
+      "kind": "tradeoff",
+      "prompt": "How should I structure a frontend testing strategy: unit, integration, or E2E?",
+      "expected_output": "Follow the Testing Trophy: a static base (TypeScript + ESLint) catches a class of bugs before tests run, then bias toward integration tests for the best confidence-to-cost ratio, a thin layer of E2E (Playwright/Cypress) for critical user flows, and unit tests only for complex pure logic. Query by role/text and assert on behavior so tests survive refactors; use MSW to intercept the network rather than mocking fetch. Avoid over-investing in slow, flaky E2E or testing implementation details.",
+      "assertions": [
+        "References the Testing Trophy / integration-heavy weighting",
+        "Includes the static layer (TypeScript/ESLint) as the base",
+        "Limits E2E to critical flows and unit tests to complex logic",
+        "Recommends querying by role/text and testing behavior, not internals",
+        "Flags the pitfall of flaky-E2E overuse or implementation-detail testing",
+        "References a related topic (e.g. frontend-observability or ci-cd-frontend)"
+      ]
+    },
+    {
+      "id": 20,
+      "group": "quality-observability",
+      "kind": "concept",
+      "prompt": "What kinds of errors do React error boundaries NOT catch, and how do I cover those gaps?",
+      "expected_output": "Error boundaries catch errors during rendering, lifecycle, and constructors of the subtree below them. They do NOT catch errors in event handlers, asynchronous code (setTimeout/Promise rejections), server-side rendering, or errors thrown in the boundary's own render. Cover those with try/catch in handlers, global window.onerror and unhandledrejection listeners, and framework-level handling (in Next.js, global-error.tsx must render its own <html>/<body> because it replaces the root layout). Place boundaries close to risky subtrees so one widget can't black out the route.",
+      "assertions": [
+        "States boundaries catch render/lifecycle errors in the subtree",
+        "Lists what they miss: event handlers, async, SSR, and the boundary's own render",
+        "Recommends window.onerror / unhandledrejection (and try/catch) to cover gaps",
+        "Mentions framework specifics (e.g. Next.js global-error.tsx rendering its own html/body)",
+        "Advises placing boundaries close to risky subtrees",
+        "References a related topic (e.g. frontend-observability)"
+      ]
+    },
+    {
+      "id": 21,
+      "group": "ui-system-design",
+      "kind": "scenario",
+      "prompt": "Design an autocomplete / typeahead that fetches suggestions as the user types.",
+      "expected_output": "Debounce keystrokes (~200-300ms) with a min-char threshold (~2). Use an AbortController to cancel the previous in-flight request so a slow older reply can't overwrite fresh results (and treat AbortError as a no-op, not an error). Cache results per query and skip the fetch on a hit. Make it an ARIA combobox: role=combobox/listbox/option, aria-activedescendant, and arrow/Enter/Escape keyboard navigation. Render loading, empty, and error states.",
+      "assertions": [
+        "Includes debounce + a minimum-character threshold",
+        "Uses AbortController to cancel in-flight requests / prevent out-of-order results",
+        "Treats AbortError as a no-op rather than a displayed error",
+        "Specifies ARIA combobox roles and keyboard navigation",
+        "Mentions per-query caching or loading/empty/error states",
+        "References a related topic (e.g. server-state-data-fetching or accessibility)"
+      ]
+    },
+    {
+      "id": 22,
+      "group": "ui-system-design",
+      "kind": "when",
+      "prompt": "When is it worth virtualizing a long list, and when does virtualization just add needless complexity?",
+      "expected_output": "Virtualize once the rendered list is large enough that DOM node count drives jank, roughly past ~200 rows, using a windowing library (e.g. TanStack Virtual) to cap the DOM at a few dozen nodes. Below that, the DOM cost is negligible and virtualization adds complexity (measuring row heights, scroll restoration, accessibility, find-in-page breakage). Pair it with keyset/cursor pagination for feeds and always provide a keyboard/screen-reader-accessible 'load more' fallback since observer sentinels are unreachable by those users.",
+      "assertions": [
+        "Gives a threshold for when to virtualize (large lists, ~hundreds of rows)",
+        "Names the benefit (caps DOM nodes / restores 60fps scroll)",
+        "States when to avoid it (small lists; added complexity like row measurement, scroll restoration, a11y)",
+        "Provides a conditional recommendation rather than 'always virtualize'",
+        "Flags an accessibility pitfall (sentinel unreachable by keyboard/SR; provide 'load more')",
+        "References a related topic (e.g. infinite-scroll-feed, data-table, or render-performance-patterns)"
+      ]
+    },
+    {
+      "id": 23,
+      "group": "interview-framework",
+      "kind": "concept",
+      "prompt": "How should I structure a frontend system design interview answer? Walk me through the RADIO framework.",
+      "expected_output": "RADIO = Requirements → Architecture → Data model → Interface (API) → Optimizations. Spend ~15% clarifying functional and non-functional requirements and calling out what's out of scope (get agreement before drawing). ~20% on architecture: the component tree and major boxes (client, BFF, services). ~15% on the data model: entities and which component owns vs renders each, separating server state from UI state. ~15% on interfaces: the network API shapes and the component API (props/events). ~35% on optimizations: performance (CWV, virtualization, code-splitting), a11y, and error/loading/empty states, which is where seniority shows.",
+      "assertions": [
+        "Names all five stages: Requirements, Architecture, Data model, Interface/API, Optimizations",
+        "Gives the rough time budget (Optimizations ~35%, Architecture ~20%, others ~15%)",
+        "States Requirements should call out scope / out-of-scope and get agreement first",
+        "Notes separating server state from UI state in the data model",
+        "Identifies Optimizations as where senior signal is shown",
+        "Frames RADIO as scaffolding to reallocate toward the interviewer's probes"
+      ]
+    },
+    {
+      "id": 24,
+      "group": "interview-framework",
+      "kind": "scenario",
+      "prompt": "Apply RADIO to 'Design a news feed.' What would you cover at each stage?",
+      "expected_output": "Requirements: infinite scroll, like/compose, 60fps scroll + LCP < 2.5s on 4G, screen-reader-accessible feed; call auth and search out of scope. Architecture: client + BFF + services, with feed/post/composer in the component tree. Data model: Post/User entities, server-owned feed state vs UI state, and which component owns vs renders each. Interface: a cursor-paginated feed endpoint shape plus component props/events. Optimizations (~35%): list virtualization, code-splitting, error/loading/empty states, and accessibility.",
+      "assertions": [
+        "Covers Requirements with concrete functional + non-functional needs and an out-of-scope call",
+        "Sketches an architecture (client/BFF/services + component tree)",
+        "Defines a data model separating server feed state from UI state",
+        "Specifies the API (cursor/keyset-paginated feed) and component interface",
+        "Spends the most depth on Optimizations (virtualization, code-splitting, a11y, states)",
+        "Cross-references concrete related topics (e.g. infinite-scroll-feed, rendering-strategies)"
+      ]
+    }
+  ]
+}
