@@ -124,6 +124,8 @@ Checked by `tiers/no-primitive-in-code`. The profile says how, per stack.
 
 **Why:** a style split into separate size, line height and weight utilities drifts one property at a time.
 
+**Line height is a ratio.** DTCG stores `lineHeight` as a unitless number relative to the font size, and CSS inherits a unitless line height as that ratio. A child that sets its own font size, without its own text style, therefore gets a line height scaled to its size, not the parent's pixel value. When a move from px line heights changes an element's rendering, give that element its own text style class. Do not store px: it is not valid DTCG.
+
 Source: https://www.designtokens.org/tr/2025.10/format/ (Typography type)
 
 ## Contrast

@@ -17,6 +17,7 @@
 
 import { resolve } from "node:path";
 import { defineConfig } from "@terrazzo/cli";
+import { RECOMMENDED_CONFIG } from "@terrazzo/parser";
 import css from "@terrazzo/plugin-css";
 import tailwind from "@terrazzo/plugin-tailwind";
 
@@ -24,7 +25,10 @@ export default defineConfig({
   tokens: ["./tokens/design.resolver.json"],
   outDir: process.env.DESIGN_TOKENS_OUT_DIR ?? "./src/styles/",
   lint: {
+    // Setting lint.rules replaces Terrazzo's recommended rules instead of adding to them (it applies
+    // RECOMMENDED_CONFIG only when lint.rules is undefined), so the recommended set is spread in first.
     rules: {
+      ...RECOMMENDED_CONFIG,
       "core/consistent-naming": ["error", { format: "kebab-case" }],
       "core/descriptions": ["warn", { ignore: ["palette.*"] }],
     },

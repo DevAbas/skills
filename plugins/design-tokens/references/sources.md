@@ -31,10 +31,19 @@ Also check whether a newer version than 2025.10 exists (https://www.designtokens
 | Terrazzo parser types | `node_modules/@terrazzo/parser/dist/types.d.ts` | `parse`, `resolver.apply`, token fields `aliasOf`, `aliasChain`, `$extensions`, `LintRule` |
 | Tailwind CSS v4 | https://tailwindcss.com/docs/theme | `@theme` namespaces, `--*: initial` resets, `@theme inline`, `--text-*--line-height` sub-properties |
 | Tailwind dark mode | https://tailwindcss.com/docs/dark-mode | `@custom-variant` for a data attribute and the system preference |
-| @google/design.md | https://github.com/google-labs-code/design.md | Front matter keys, CLI commands (`lint`, `diff`, `export`, `spec`), the linter's rules, whether `imports:` is supported yet (issue #28) |
+| @google/design.md | https://github.com/google-labs-code/design.md | Front matter keys, CLI commands (`lint`, `diff`, `export`, `spec`), the linter's rules, whether `imports:` is supported yet (issue #28), and whether `export --format dtcg` still has the defects below |
 | Style Dictionary | https://styledictionary.com/info/dtcg/ | DTCG support in the installed version, the converter for older tokens |
 | Radix custom palette | https://www.radix-ui.com/colors/custom | The generator a palette may come from; record its version |
 | Radix scale | https://www.radix-ui.com/colors/docs/palette-composition/understanding-the-scale | What each of the 12 steps is for |
+
+## Migrating from design.md front matter
+
+Write the DTCG files directly from the front matter. Do not use `designmd export --format dtcg` as the source: in 0.4.0 its output has three defects.
+- **Alpha is lost.** A colour with alpha keeps its 8-digit hex in `hex`, which DTCG does not allow, and no `alpha` is written.
+- **Line height is wrong.** A px line height becomes a bare number (`36px` becomes `36`), which DTCG reads as 36 times the font size.
+- **The group is renamed.** `colors` becomes `color`, so every id the rules document cites changes.
+
+Re-check these in the installed version before relying on the export.
 
 ## Industry practice (for the "why")
 

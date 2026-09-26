@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { comparable, staleOutputs } from "../check-generated.mjs";
+import { comparable, emptyOutputs, staleOutputs } from "../check-generated.mjs";
+
+describe("emptyOutputs", () => {
+  it("names an output without a single custom property: a @tz that matched no context", () => {
+    assert.deepEqual(emptyOutputs({ "theme.generated.css": "/* header */\n@theme {\n}\n", "tokens.generated.css": ":root {\n  --color-surface: #fff;\n}" }), ["theme.generated.css"]);
+  });
+
+  it("passes outputs that declare tokens", () => {
+    assert.deepEqual(emptyOutputs({ "theme.generated.css": "@theme { --text-body--line-height: 1.5; }" }), []);
+  });
+});
 
 describe("staleOutputs", () => {
   it("ignores only the header line that names the template's path", () => {

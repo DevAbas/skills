@@ -7,6 +7,25 @@ A version bump means:
 - **Minor:** a new rule, gate, profile or skill.
 - **Patch:** a fix or a clarification.
 
+## 0.2.1
+
+Lessons from migrating a real project to DTCG with Terrazzo.
+
+- **Fix: the Terrazzo config template now keeps the recommended lint rules.** Terrazzo applies its recommended rules only when `lint.rules` is undefined, so the 0.2.0 template, which set two rules, ran none of the recommended ones. It now spreads `RECOMMENDED_CONFIG` from `@terrazzo/parser`.
+- **`check-generated.mjs`** fails an output that declares no token. A template `@tz(...)` that matches no context builds an empty theme with exit 0.
+- **Profile: new Pitfalls section.**
+  - `lint.rules` replaces the recommended rules.
+  - A relative template path resolves against `outDir`.
+  - A single context still gets a resolver modifier, not Terrazzo's internal `tzMode`.
+  - A DTCG `lineHeight` is a ratio that children inherit.
+- **Decisions, Text styles:** the line height ratio, and the fix when a migration changes rendering.
+- **Sources:** `designmd export --format dtcg` (0.4.0) is not a migration source. It loses alpha, turns a px line height into a ratio, and renames `colors` to `color`.
+- **`fix`:** a batch that must not change rendering is proven with the project's own visual check, whose output location comes from its config, never from a disk search.
+- **Search guardrail.**
+  - `scripts/search-scope.mjs` blocks a search outside the project, the plugin and the scratchpad: Bash `find`, recursive `grep`, `rg`, `fd`, `ls -R`, `mdfind`, `locate`, and Glob or Grep.
+  - The four skills register it in their frontmatter, for the rest of a session that uses them.
+  - `hooks/hooks.json` registers it for the auditor subagent only.
+
 ## 0.2.0
 
 Changes from the first audits of real projects.

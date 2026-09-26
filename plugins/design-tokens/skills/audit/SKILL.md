@@ -10,6 +10,13 @@ description: >-
 license: MIT
 compatibility: Claude Code, as part of the design-tokens plugin. Node.js 20 or later.
 allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs *) Bash(date -u *) Read Grep Glob
+hooks:
+  PreToolUse:
+    - matcher: "Bash|Glob|Grep"
+      hooks:
+        - type: command
+          command: node
+          args: ["${CLAUDE_PLUGIN_ROOT}/scripts/search-scope.mjs"]
 metadata:
   author: Abas Turabli
   author-title: AI-First Frontend Architect
@@ -99,6 +106,7 @@ Then offer the next steps:
 
 ## Rules
 
+- **Search inside the project.** Search only the project, the plugin's files and the session scratchpad. Find where a tool writes its output from its config or documentation, never by searching the disk. A hook blocks searches outside those places (`${CLAUDE_PLUGIN_ROOT}/scripts/search-scope.mjs`).
 - **Read-only.** The only files this skill writes are the report files.
 - **Evidence you read.** Every finding cites a file and line the auditor read. A rule that cannot be confirmed is stated as unconfirmed, not reported as broken.
 - **Rubric only.** Findings are the rubric's rules and nothing else.

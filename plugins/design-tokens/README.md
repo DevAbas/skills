@@ -27,6 +27,8 @@ claude plugin install design-tokens@fearchitect
 
 The audit runs its analysis in a read-only subagent, `design-tokens:token-auditor`.
 
+While a skill of this plugin is in use, a hook keeps its searches inside the project, the plugin and the session scratchpad. A search of the whole disk (`find /`, `rg ~`, a Glob at `/`) is blocked with the reason, so the agent reads a tool's output location from its config instead. This also avoids macOS access prompts for folders such as Downloads and Desktop. Sessions that never invoke the plugin's skills are not affected.
+
 ## The rubric
 
 Four parts, each `met`, `partial` or `missing`. Every finding names a rule id that stays stable across audits:

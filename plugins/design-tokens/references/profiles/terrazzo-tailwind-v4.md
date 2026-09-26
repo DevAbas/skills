@@ -80,3 +80,16 @@ Ask before adding each one:
 - `@google/design.md`, only when the project wants its contrast and structure lint.
 
 `lightningcss` comes with Tailwind v4. Confirm it resolves before relying on it (`node -e "import('lightningcss')"`).
+
+## Pitfalls
+
+Found while migrating a real project, and confirmed in Terrazzo 2.7.1. Re-check each one in the installed version.
+
+- **`lint.rules` replaces the recommended rules.** Terrazzo applies its recommended set only when `lint.rules` is undefined, so a config that sets any rule runs only those rules. Spread the recommended set first: `rules: { ...RECOMMENDED_CONFIG, … }`, with `RECOMMENDED_CONFIG` from `@terrazzo/parser`. The template config does this.
+- **A relative template path resolves against `outDir`, not the project root.** The build then fails with "Could not locate template". Pass the path through `resolve()`, as the template config does.
+- **One context still gets a modifier.** For a single theme, give the resolver one modifier with one context (`"theme": { "contexts": { "dark": [...] }, "default": "dark" }`) and write `@tz(theme: "dark")`.
+  - A resolver without a modifier builds with `@tz(tzMode: ".")`, but `tzMode` is Terrazzo's internal modifier name, not a documented argument.
+  - A missing or wrong argument (`@tz()`, `@tz(tzMode: "nope")`) builds an empty `@theme` with exit 0 and only a "matched 0 tokens" warning. `check-generated.mjs` fails on an output with no tokens for this reason.
+- **A DTCG `lineHeight` is a unitless ratio** (`36/28` is `1.2857…`). CSS inherits a unitless line height as a ratio, so a child that changes font size without its own text style gets a different line height than it did with a px value.
+  - Keep the ratio: a px `lineHeight` is not valid DTCG, even though Terrazzo accepts it.
+  - When a migration changes rendering, give that element its own `text-<role>` class (decisions, Text styles).

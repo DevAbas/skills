@@ -9,6 +9,13 @@ description: >-
 license: MIT
 compatibility: Claude Code, as part of the design-tokens plugin. Node.js 20 or later.
 allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/compare-reports.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *)
+hooks:
+  PreToolUse:
+    - matcher: "Bash|Glob|Grep"
+      hooks:
+        - type: command
+          command: node
+          args: ["${CLAUDE_PLUGIN_ROOT}/scripts/search-scope.mjs"]
 metadata:
   author: Abas Turabli
   author-title: AI-First Frontend Architect
@@ -59,6 +66,12 @@ Present the plan and wait for approval. Use plan mode when the session offers it
 - **No rules document:** start from `${CLAUDE_PLUGIN_ROOT}/assets/setup/DESIGN.md`, keep its sections and fill them from the project's tokens and components.
 - **Another rules document:** keep it, and bring it to the rules (decisions, The rules document: no values, a machine-readable contract, only existing token ids). Do not add a second document beside it.
 
+**Batches that must not change rendering.** A migration, a rename or a move of values should leave every page looking the same. The plan says how that is proven:
+- **Baseline and compare.** Take a baseline with the project's own visual check (its screenshot or visual-regression script) before any change, and compare after it.
+- **Output location.** Read where that tool writes its output from its config, its script or its documentation. Never search the disk for it.
+- **No visual check.** If the project has none, say so and ask how to verify. Do not install one unasked.
+- **Any difference** stops the batch and is reported with the pages and elements it touches.
+
 ## Step 3: Implement
 
 - **Stay in scope.** Change only what the approved plan lists. A new problem found on the way is reported, not fixed in passing.
@@ -85,6 +98,7 @@ Present the plan and wait for approval. Use plan mode when the session offers it
 
 ## Rules
 
+- **Search inside the project.** Search only the project, the plugin's files and the session scratchpad. Find where a tool writes its output from its config or documentation, never by searching the disk. A hook blocks searches outside those places (`${CLAUDE_PLUGIN_ROOT}/scripts/search-scope.mjs`).
 - **Plan first.** Nothing changes before approval.
 - **No hand edits to outputs.** Never edit a generated output by hand.
 - **Approval for new things.** Never add a dependency, a command or a CI job without approval.

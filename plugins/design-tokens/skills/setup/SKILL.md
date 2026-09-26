@@ -10,6 +10,13 @@ description: >-
 license: MIT
 compatibility: Claude Code, as part of the design-tokens plugin. Node.js 20 or later.
 allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *)
+hooks:
+  PreToolUse:
+    - matcher: "Bash|Glob|Grep"
+      hooks:
+        - type: command
+          command: node
+          args: ["${CLAUDE_PLUGIN_ROOT}/scripts/search-scope.mjs"]
 metadata:
   author: Abas Turabli
   author-title: AI-First Frontend Architect
@@ -118,6 +125,7 @@ Then run `/design-tokens:audit`. A fresh setup meets every part (`met`), apart f
 
 ## Rules
 
+- **Search inside the project.** Search only the project, the plugin's files and the session scratchpad. Find where a tool writes its output from its config or documentation, never by searching the disk. A hook blocks searches outside those places (`${CLAUDE_PLUGIN_ROOT}/scripts/search-scope.mjs`).
 - **Plan first.** Nothing is written before approval.
 - **Values in one place.** No value in the rules document, the code or the build template. Every value is in a token file.
 - **No palette in code.** No palette entry is reachable from code.

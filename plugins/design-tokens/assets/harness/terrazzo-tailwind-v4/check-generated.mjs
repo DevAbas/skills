@@ -6,6 +6,9 @@
 //
 //   node check-generated.mjs        exit 1 naming each stale or missing output
 //
+// An output with no token at all fails too: Terrazzo builds an empty theme,
+// with exit 0, when a template's @tz(...) matches no context.
+//
 // Terrazzo's header names the template relative to the output folder, which
 // differs for the temporary build, so that line is ignored. The output folder
 // comes from design-tokens.gates.json (`tokens.outDir`, project-modules.mjs).
@@ -21,6 +24,15 @@ import { tokenSettings } from "./project-modules.mjs";
 export const comparable = (css) => css.replace(/^ \*\s+template: .*$/m, "");
 
 /** The outputs whose content differs from the fresh build, or that are missing. */
+/**
+ * The outputs that declare no custom property. A `@tz(...)` argument that matches no context builds an empty theme
+ * and Terrazzo still exits 0 (with a "matched 0 tokens" warning), so an empty output fails here instead of passing
+ * as "unchanged" when the committed file is empty too.
+ */
+export function emptyOutputs(fresh) {
+  return Object.keys(fresh).filter((file) => !/--[a-zA-Z0-9-]+\s*:/.test(fresh[file]));
+}
+
 export function staleOutputs(fresh, committed) {
   return Object.keys(fresh).filter((file) => committed[file] === undefined || comparable(committed[file]) !== comparable(fresh[file]));
 }
@@ -50,6 +62,11 @@ function main() {
         .filter(([, path]) => existsSync(path))
         .map(([file, path]) => [file, readFileSync(path, "utf8")]),
     );
+    const empty = emptyOutputs(fresh);
+    if (empty.length > 0) {
+      console.error(`Terrazzo built ${empty.join(", ")} without a single token. Check the template's @tz(...) arguments: a modifier or context that matches nothing empties the output, and Terrazzo exits 0 with only a "matched 0 tokens" warning.`);
+      return 1;
+    }
     const stale = staleOutputs(fresh, committed);
     if (stale.length > 0) {
       console.error(`Out of date: ${stale.map((file) => join(settings.outDir, file)).join(", ")}. The values live in the token files: change them there and rebuild (never edit the outputs by hand).`);

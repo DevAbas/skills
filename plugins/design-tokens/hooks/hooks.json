@@ -1,0 +1,18 @@
+{
+  "description": "Keeps the read-only auditor's Glob and Grep searches inside the project. The script returns at once for any other caller; the skills register the same guardrail in their own frontmatter.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Glob|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/search-scope.mjs", "--auditor-only"],
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
