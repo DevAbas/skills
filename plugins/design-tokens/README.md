@@ -16,6 +16,51 @@ claude plugin marketplace add DevAbas/skills
 claude plugin install design-tokens@fearchitect
 ```
 
+## Stack and dependencies
+
+Read this before you install. The plugin is opinionated in two layers: standards every skill applies, and one tool profile that its ready-made gates are written for.
+
+### Standards every skill applies
+
+| Standard | What the plugin expects |
+|---|---|
+| [W3C Design Tokens (DTCG) 2025.10](https://www.designtokens.org/tr/2025.10/) | Token values live in DTCG files. The audit reports other formats (Sass variables, a JS theme object, design.md front matter) as a finding with a migration path |
+| [DESIGN.md](https://github.com/google-labs-code/design.md) (Google, alpha) | The recommended rules document. Another document qualifies when it holds the rules and no values |
+| [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html) | Contrast between text or icons and the surfaces they sit on |
+
+### What each part needs, and what it adds to your project
+
+| Part | Works with | Adds to your project |
+|---|---|---|
+| The plugin itself | Claude Code, Node.js 20 or later | Nothing. Its scripts have no dependencies, including its own DTCG reader and colour maths |
+| `audit` | Any web stack. On a project with DTCG files it also runs the token check, deterministically, with no install | Only its reports, in `design-tokens-audit/` |
+| `fix` | Any web stack | What the approved plan names. Every new dependency is asked for first |
+| `setup` | Web. It proposes the Terrazzo + Tailwind v4 profile, and other stacks choose a build tool with you | Token files, `DESIGN.md`, the build config, and the approved dependencies |
+| `harness`, core gates and checks | Any web stack that runs Node. The token check and the rules-document check are copied as plain scripts | `design-tokens.gates.json`, `.claude/hooks/design-tokens/`, a git pre-commit hook, an optional CI job. Changes to `.claude/settings.json`, git hooks, `package.json` or CI are asked for first |
+| `harness`, profile checks | The profile below | The build staleness check and the ESLint rules, adapted from the plugin |
+
+### Profile: Terrazzo + Tailwind CSS v4
+
+The only profile today. It assumes **Tailwind CSS v4**, and builds the Tailwind theme from DTCG tokens with **Terrazzo**. When a skill applies it, it may add these packages, each only after you approve it. The token check needs none of them: the plugin reads DTCG and computes derived colours itself.
+
+| Package | Why | License | Tested with |
+|---|---|---|---|
+| `@terrazzo/cli`, `@terrazzo/parser`, `@terrazzo/plugin-css`, `@terrazzo/plugin-tailwind` | Build the CSS and the Tailwind theme from the tokens, and lint the token files | MIT | 2.7.1 |
+| `yaml` | Read `DESIGN.md`'s front matter in the contract check | ISC | 2.9.1 |
+| ESLint (flat config) | Run the `token-classes` and `no-raw-color` rules. The project's own ESLint is used | MIT | 9.39. ESLint 10 is not tested yet |
+| `@google/design.md` | Optional: lint `DESIGN.md` and its contrast pairs | Apache-2.0 | 0.4.0 |
+
+### Without a matching profile
+
+- **Supported web stacks:** Sass, CSS Modules, CSS-in-JS (styled-components, Emotion, vanilla-extract), Style Dictionary, Vue or Svelte. These get the core rubric.
+- **What changes:** the token and rules-document checks work as they are, but the code lint and the build check have no ready-made version. `harness` writes the gates for that stack's own tools, and asks before adding anything.
+- **Results:** they are comparable with any other audit, but lean more on the model's reading than on scripts.
+
+### Not covered
+
+- Native platforms: iOS, Android, React Native.
+- Agents other than Claude Code.
+
 ## Skills
 
 | Skill | What it does |
@@ -42,11 +87,6 @@ Four parts, each `met`, `partial` or `missing`. Every finding names a rule id th
 
 See `references/rubric.md`. The reasons behind each rule, with sources, are in `references/principles.md` and `references/decisions.md`.
 
-## Profiles
-
-The core rules hold in any web stack. A profile says how to build and gate them with specific tools:
-- `terrazzo-tailwind-v4`: DTCG → Terrazzo → Tailwind CSS v4.
-
 ## Knowledge that stays current
 
 The plugin records procedures and sources, not version facts:
@@ -55,13 +95,6 @@ The plugin records procedures and sources, not version facts:
 - **The gap:** the difference between the two is reported.
 
 See `references/sources.md`.
-
-## Requirements
-
-- Claude Code.
-- Node.js 20 or later.
-
-The plugin's own scripts have no dependencies. The profile's checks use the project's own packages, and the skills ask before adding any.
 
 ## Tests
 

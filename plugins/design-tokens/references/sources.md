@@ -28,7 +28,7 @@ Also check whether a newer version than 2025.10 exists (https://www.designtokens
 | Terrazzo resolvers | https://terrazzo.app/docs/guides/resolvers/ | How a resolver is passed in and how each context is built |
 | Terrazzo Tailwind | https://terrazzo.app/docs/integrations/tailwind/ | `template`, `@tz (…)` syntax, `theme` mapping, typography sub-properties |
 | Terrazzo lint | https://terrazzo.app/docs/linting/ | Built-in rules and options (`core/consistent-naming`, `core/descriptions`, `a11y/min-contrast`), the custom rule API |
-| Terrazzo parser types | `node_modules/@terrazzo/parser/dist/types.d.ts` | `parse`, `resolver.apply`, token fields `aliasOf`, `aliasChain`, `$extensions`, `LintRule` |
+| Terrazzo parser types | `node_modules/@terrazzo/parser/dist/types.d.ts` | `RECOMMENDED_CONFIG`, `LintRule`, and anything a custom Terrazzo lint rule needs. The plugin's own checks read DTCG with `scripts/lib/dtcg.mjs` |
 | Tailwind CSS v4 | https://tailwindcss.com/docs/theme | `@theme` namespaces, `--*: initial` resets, `@theme inline`, `--text-*--line-height` sub-properties |
 | Tailwind dark mode | https://tailwindcss.com/docs/dark-mode | `@custom-variant` for a data attribute and the system preference |
 | @google/design.md | https://github.com/google-labs-code/design.md | Front matter keys, CLI commands (`lint`, `diff`, `export`, `spec`), the linter's rules, whether `imports:` is supported yet (issue #28), and whether `export --format dtcg` still has the defects below |

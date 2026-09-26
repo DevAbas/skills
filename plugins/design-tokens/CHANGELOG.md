@@ -7,6 +7,23 @@ A version bump means:
 - **Minor:** a new rule, gate, profile or skill.
 - **Patch:** a fix or a clarification.
 
+## 0.3.0
+
+The checks no longer depend on the build tool.
+
+- **An in-house DTCG 2025.10 reader, `scripts/lib/dtcg.mjs`.**
+  - It covers the resolver with sets, modifiers, input validation and `$ref`s; alias chains and cycles; `$type` inheritance; `$root`; `$extends`; and JSON Pointer references.
+  - Its resolved values match `@terrazzo/parser` on a real token set of 138 tokens in two contexts.
+- **In-house colour maths, `scripts/lib/color.mjs`.**
+  - It gives the same hex as lightningcss for derived roles: identical on 19,865 random lightness and mix rules, with a committed reference table.
+  - Unlike reading lightningcss's output, it never breaks on a named colour (`indigo`).
+- **`scripts/check-tokens.mjs` is now a core check with no dependencies.**
+  - `audit` runs it on any project with DTCG files, as deterministic evidence.
+  - It also reports what the reader finds wrong with the files (`format/dtcg-valid`), and accepts plain token files (`tokens.files`).
+- **The checks moved to `scripts/`, keeping their relative imports:** `check-rules-contract.mjs`, `lib/`, and `profiles/terrazzo-tailwind-v4/check-generated.mjs`. `harness` copies them with that layout. The profile assets keep the ESLint rules and the build templates.
+- **Correction to 0.2.1.** A modifier needs two or more contexts (Resolver §4.1.5.1), so a single theme is a set in a resolver without modifiers, built with `@tz(tzMode: ".")`. The 0.2.1 advice, a one-context modifier, was invalid DTCG.
+- **README** gains a "Stack and dependencies" section: the standards the plugin applies, what each part needs and adds, and the profile's packages with licence and tested version.
+
 ## 0.2.1
 
 Lessons from migrating a real project to DTCG with Terrazzo.

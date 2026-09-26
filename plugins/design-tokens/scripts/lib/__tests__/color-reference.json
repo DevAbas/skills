@@ -1,0 +1,2046 @@
+{
+ "generator": "lightningcss 1.32.0, transform() with targets { chrome: 80 << 16 }, seed 20260926",
+ "rows": [
+  {
+   "from": "#27030f",
+   "over": "#38fa90",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.7
+   },
+   "hex": "#2c4d36"
+  },
+  {
+   "from": "#41da7b",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.34
+   },
+   "hex": "#006929"
+  },
+  {
+   "from": "#4f356f",
+   "over": "#f1ed25",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.83
+   },
+   "hex": "#6b5462"
+  },
+  {
+   "from": "#a9ff78",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.06
+   },
+   "hex": "#eaffe0"
+  },
+  {
+   "from": "#3810c3",
+   "over": "#c49403",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.41
+   },
+   "hex": "#8b5e52"
+  },
+  {
+   "from": "#cae3a1",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.03
+   },
+   "hex": "#d4edab"
+  },
+  {
+   "from": "#764a11",
+   "over": "#ee654d",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.79
+   },
+   "hex": "#8f501e"
+  },
+  {
+   "from": "#999b2b",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.33
+   },
+   "hex": "#ffffd0"
+  },
+  {
+   "from": "#18feae",
+   "over": "#ce77dc",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.9
+   },
+   "hex": "#2af1b3"
+  },
+  {
+   "from": "#9e12f4",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.35
+   },
+   "hex": "#ecd6ff"
+  },
+  {
+   "from": "#4a3fef",
+   "over": "#7289cc",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.07
+   },
+   "hex": "#6f84ce"
+  },
+  {
+   "from": "#0f0daa",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.33
+   },
+   "hex": "#638eff"
+  },
+  {
+   "from": "#4b0dbc",
+   "over": "#6cb617",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.4
+   },
+   "hex": "#5f7259"
+  },
+  {
+   "from": "#de95d8",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.24
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#bb78dc",
+   "over": "#ce2115",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.78
+   },
+   "hex": "#bf65b0"
+  },
+  {
+   "from": "#0bb5b1",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.07
+   },
+   "hex": "#009e9a"
+  },
+  {
+   "from": "#d78788",
+   "over": "#845c2f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.08
+   },
+   "hex": "#8b5f36"
+  },
+  {
+   "from": "#30a273",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.28
+   },
+   "hex": "#004a2c"
+  },
+  {
+   "from": "#20a20a",
+   "over": "#d9ca63",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.74
+   },
+   "hex": "#50ac21"
+  },
+  {
+   "from": "#4da0a9",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.14
+   },
+   "hex": "#7acdd6"
+  },
+  {
+   "from": "#90dd2c",
+   "over": "#fcb7f9",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.38
+   },
+   "hex": "#d3c5ab"
+  },
+  {
+   "from": "#8070c9",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.32
+   },
+   "hex": "#e3dfff"
+  },
+  {
+   "from": "#2bc11a",
+   "over": "#cdc945",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.46
+   },
+   "hex": "#82c531"
+  },
+  {
+   "from": "#c52509",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.37
+   },
+   "hex": "#260000"
+  },
+  {
+   "from": "#fd043f",
+   "over": "#bafc1e",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.91
+   },
+   "hex": "#f71a3c"
+  },
+  {
+   "from": "#b3c24f",
+   "over": "#ec224d",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.13
+   },
+   "hex": "#e5374d"
+  },
+  {
+   "from": "#a19191",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.1
+   },
+   "hex": "#c0b0b0"
+  },
+  {
+   "from": "#b2dca2",
+   "over": "#cfde77",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.67
+   },
+   "hex": "#bcdd94"
+  },
+  {
+   "from": "#5ba3d6",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.03
+   },
+   "hex": "#529acc"
+  },
+  {
+   "from": "#eccaac",
+   "over": "#48a513",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.41
+   },
+   "hex": "#8bb452"
+  },
+  {
+   "from": "#0cd713",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.17
+   },
+   "hex": "#b6ffb0"
+  },
+  {
+   "from": "#8a86cf",
+   "over": "#94a3d5",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.8
+   },
+   "hex": "#8c8cd0"
+  },
+  {
+   "from": "#c471d5",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.25
+   },
+   "hex": "#752385"
+  },
+  {
+   "from": "#0bf81e",
+   "over": "#338887",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.45
+   },
+   "hex": "#21ba58"
+  },
+  {
+   "from": "#70091e",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.36
+   },
+   "hex": "#e97d81"
+  },
+  {
+   "from": "#b10b8a",
+   "over": "#c9d2f4",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.07
+   },
+   "hex": "#c7c4ed"
+  },
+  {
+   "from": "#ce9348",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.37
+   },
+   "hex": "#522d00"
+  },
+  {
+   "from": "#c029ba",
+   "over": "#1eb29a",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.65
+   },
+   "hex": "#8759af"
+  },
+  {
+   "from": "#7e0876",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.38
+   },
+   "hex": "#010000"
+  },
+  {
+   "from": "#54704e",
+   "over": "#38df84",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.65
+   },
+   "hex": "#4a9761"
+  },
+  {
+   "from": "#aeb45a",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.09
+   },
+   "hex": "#92983d"
+  },
+  {
+   "from": "#fee50a",
+   "over": "#6733f7",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.25
+   },
+   "hex": "#8d60bc"
+  },
+  {
+   "from": "#7beaab",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.19
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#56f94d",
+   "over": "#dd7c18",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.99
+   },
+   "hex": "#57f84c"
+  },
+  {
+   "from": "#832665",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.06
+   },
+   "hex": "#963976"
+  },
+  {
+   "from": "#2b791a",
+   "over": "#f99332",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.4
+   },
+   "hex": "#a78928"
+  },
+  {
+   "from": "#299bbc",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.07
+   },
+   "hex": "#45b1d3"
+  },
+  {
+   "from": "#94f5ef",
+   "over": "#031912",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.07
+   },
+   "hex": "#0d2821"
+  },
+  {
+   "from": "#ba7e48",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.03
+   },
+   "hex": "#b0753f"
+  },
+  {
+   "from": "#72ebf0",
+   "over": "#1e35b5",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.12
+   },
+   "hex": "#284bbc"
+  },
+  {
+   "from": "#48e182",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.36
+   },
+   "hex": "#006929"
+  },
+  {
+   "from": "#0e1087",
+   "over": "#6fbdd3",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.23
+   },
+   "hex": "#5995c2"
+  },
+  {
+   "from": "#5747fa",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.01
+   },
+   "hex": "#594bfe"
+  },
+  {
+   "from": "#b38c34",
+   "over": "#44388a",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.38
+   },
+   "hex": "#6e5869"
+  },
+  {
+   "from": "#f237e3",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.23
+   },
+   "hex": "#910088"
+  },
+  {
+   "from": "#53bc7a",
+   "over": "#3ed5fd",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.74
+   },
+   "hex": "#4ec39c"
+  },
+  {
+   "from": "#0cc3ef",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.32
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#66d1f5",
+   "over": "#3ef1b5",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.52
+   },
+   "hex": "#53e0d6"
+  },
+  {
+   "from": "#3973fd",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.11
+   },
+   "hex": "#6c9dff"
+  },
+  {
+   "from": "#4fa805",
+   "over": "#bff89a",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.31
+   },
+   "hex": "#9cdf6c"
+  },
+  {
+   "from": "#999fd0",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.28
+   },
+   "hex": "#fbfdff"
+  },
+  {
+   "from": "#b4558f",
+   "over": "#1abd51",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.72
+   },
+   "hex": "#89727e"
+  },
+  {
+   "from": "#c2e2ea",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.17
+   },
+   "hex": "#8dabb3"
+  },
+  {
+   "from": "#898c39",
+   "over": "#f3b8df",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.68
+   },
+   "hex": "#ab9a6e"
+  },
+  {
+   "from": "#31c0a5",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.11
+   },
+   "hex": "#5fe4c8"
+  },
+  {
+   "from": "#90ea5f",
+   "over": "#9d3e65",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.61
+   },
+   "hex": "#95a761"
+  },
+  {
+   "from": "#809ca0",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.16
+   },
+   "hex": "#526c70"
+  },
+  {
+   "from": "#b43c1a",
+   "over": "#73d9b2",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.19
+   },
+   "hex": "#7fbb95"
+  },
+  {
+   "from": "#d5f9cd",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.26
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#d52b75",
+   "over": "#333d89",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.79
+   },
+   "hex": "#b32f79"
+  },
+  {
+   "from": "#727b6b",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.16
+   },
+   "hex": "#454e3f"
+  },
+  {
+   "from": "#abb976",
+   "over": "#fe289b",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.31
+   },
+   "hex": "#e45590"
+  },
+  {
+   "from": "#3d6085",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.13
+   },
+   "hex": "#6286ad"
+  },
+  {
+   "from": "#90b9cd",
+   "over": "#16cea8",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.66
+   },
+   "hex": "#67c0c0"
+  },
+  {
+   "from": "#554be9",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.09
+   },
+   "hex": "#6c6dff"
+  },
+  {
+   "from": "#fc55f8",
+   "over": "#79722c",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.68
+   },
+   "hex": "#d25eb7"
+  },
+  {
+   "from": "#2de7d7",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.35
+   },
+   "hex": "#007268"
+  },
+  {
+   "from": "#ca0611",
+   "over": "#8ede6f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.77
+   },
+   "hex": "#bc3827"
+  },
+  {
+   "from": "#8b2603",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.35
+   },
+   "hex": "#060000"
+  },
+  {
+   "from": "#631750",
+   "over": "#667fd7",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.35
+   },
+   "hex": "#655ba8"
+  },
+  {
+   "from": "#527a70",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.36
+   },
+   "hex": "#001813"
+  },
+  {
+   "from": "#5ff123",
+   "over": "#aa3b68",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.47
+   },
+   "hex": "#879148"
+  },
+  {
+   "from": "#37508d",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.02
+   },
+   "hex": "#3c5693"
+  },
+  {
+   "from": "#0afce1",
+   "over": "#f85b20",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.07
+   },
+   "hex": "#e7662e"
+  },
+  {
+   "from": "#b3082a",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.39
+   },
+   "hex": "#ffc4c2"
+  },
+  {
+   "from": "#503036",
+   "over": "#c4b951",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.87
+   },
+   "hex": "#5f423a"
+  },
+  {
+   "from": "#fad047",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.38
+   },
+   "hex": "#795d00"
+  },
+  {
+   "from": "#55a237",
+   "over": "#7fadd0",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.3
+   },
+   "hex": "#72aaa2"
+  },
+  {
+   "from": "#8602d6",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.24
+   },
+   "hex": "#35005b"
+  },
+  {
+   "from": "#8f1d26",
+   "over": "#1c91e5",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.81
+   },
+   "hex": "#79334a"
+  },
+  {
+   "from": "#463f7b",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.33
+   },
+   "hex": "#a4a0e5"
+  },
+  {
+   "from": "#129edf",
+   "over": "#1a3d56",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.24
+   },
+   "hex": "#185477"
+  },
+  {
+   "from": "#1a8d2b",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.39
+   },
+   "hex": "#001600"
+  },
+  {
+   "from": "#ab7ac6",
+   "over": "#937d2c",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.97
+   },
+   "hex": "#aa7ac1"
+  },
+  {
+   "from": "#635f0f",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.15
+   },
+   "hex": "#8f8b42"
+  },
+  {
+   "from": "#ce63ba",
+   "over": "#03801e",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.19
+   },
+   "hex": "#2a7a3c"
+  },
+  {
+   "from": "#afe9a4",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.09
+   },
+   "hex": "#d7ffce"
+  },
+  {
+   "from": "#8027bb",
+   "over": "#39ad41",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.41
+   },
+   "hex": "#567673"
+  },
+  {
+   "from": "#4be250",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.01
+   },
+   "hex": "#47df4c"
+  },
+  {
+   "from": "#73aa9a",
+   "over": "#901daf",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.42
+   },
+   "hex": "#8458a6"
+  },
+  {
+   "from": "#7baa27",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.02
+   },
+   "hex": "#75a41d"
+  },
+  {
+   "from": "#d9caa2",
+   "over": "#fc391f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.94
+   },
+   "hex": "#dbc19a"
+  },
+  {
+   "from": "#73a7e3",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.34
+   },
+   "hex": "#0d4276"
+  },
+  {
+   "from": "#a2057f",
+   "over": "#14560e",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.24
+   },
+   "hex": "#364329"
+  },
+  {
+   "from": "#00ae77",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.08
+   },
+   "hex": "#3ac88f"
+  },
+  {
+   "from": "#70ca8f",
+   "over": "#594c99",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.7
+   },
+   "hex": "#69a492"
+  },
+  {
+   "from": "#5d0060",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.28
+   },
+   "hex": "#020003"
+  },
+  {
+   "from": "#95361e",
+   "over": "#4967fc",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.68
+   },
+   "hex": "#7d4665"
+  },
+  {
+   "from": "#7a1200",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.18
+   },
+   "hex": "#320000"
+  },
+  {
+   "from": "#672877",
+   "over": "#2e3893",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.87
+   },
+   "hex": "#602a7b"
+  },
+  {
+   "from": "#509e0f",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.04
+   },
+   "hex": "#469100"
+  },
+  {
+   "from": "#caa5b7",
+   "over": "#6b04bd",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.11
+   },
+   "hex": "#7516bc"
+  },
+  {
+   "from": "#21c6c2",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.03
+   },
+   "hex": "#00bcb8"
+  },
+  {
+   "from": "#9182ce",
+   "over": "#be623f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.89
+   },
+   "hex": "#967ebe"
+  },
+  {
+   "from": "#2b81ee",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.11
+   },
+   "hex": "#5ea6ff"
+  },
+  {
+   "from": "#2a0fa7",
+   "over": "#62ae43",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.19
+   },
+   "hex": "#579056"
+  },
+  {
+   "from": "#d23dc3",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.25
+   },
+   "hex": "#700068"
+  },
+  {
+   "from": "#294170",
+   "over": "#726555",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.99
+   },
+   "hex": "#2a4170"
+  },
+  {
+   "from": "#b4731c",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.38
+   },
+   "hex": "#fff9e6"
+  },
+  {
+   "from": "#8f8395",
+   "over": "#4bb2ee",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.8
+   },
+   "hex": "#818ca7"
+  },
+  {
+   "from": "#7d0ee7",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.15
+   },
+   "hex": "#4d0095"
+  },
+  {
+   "from": "#3ecf05",
+   "over": "#ff0e9d",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.94
+   },
+   "hex": "#4ac30e"
+  },
+  {
+   "from": "#68744b",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.34
+   },
+   "hex": "#d0deb1"
+  },
+  {
+   "from": "#470db6",
+   "over": "#773d46",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.42
+   },
+   "hex": "#632975"
+  },
+  {
+   "from": "#ca4ac7",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.08
+   },
+   "hex": "#af2dad"
+  },
+  {
+   "from": "#d5395b",
+   "over": "#721468",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.98
+   },
+   "hex": "#d3385b"
+  },
+  {
+   "from": "#7ef193",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.38
+   },
+   "hex": "#007529"
+  },
+  {
+   "from": "#7a8ed0",
+   "over": "#49a4e4",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.86
+   },
+   "hex": "#7391d3"
+  },
+  {
+   "from": "#746b45",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.04
+   },
+   "hex": "#68603a"
+  },
+  {
+   "from": "#dcc752",
+   "over": "#17be65",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.55
+   },
+   "hex": "#83c35b"
+  },
+  {
+   "from": "#a33ce6",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.24
+   },
+   "hex": "#dbafff"
+  },
+  {
+   "from": "#ebcd73",
+   "over": "#ee380a",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.93
+   },
+   "hex": "#ebc36c"
+  },
+  {
+   "from": "#96bb54",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.1
+   },
+   "hex": "#789b32"
+  },
+  {
+   "from": "#ef3946",
+   "over": "#e9bd26",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.98
+   },
+   "hex": "#ef3c45"
+  },
+  {
+   "from": "#ca36fd",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.23
+   },
+   "hex": "#f0c1ff"
+  },
+  {
+   "from": "#17653d",
+   "over": "#c35f1e",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.91
+   },
+   "hex": "#26643a"
+  },
+  {
+   "from": "#751f65",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.09
+   },
+   "hex": "#58004b"
+  },
+  {
+   "from": "#985ffe",
+   "over": "#6c2c61",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.4
+   },
+   "hex": "#7e40a0"
+  },
+  {
+   "from": "#85988e",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.17
+   },
+   "hex": "#b9cdc3"
+  },
+  {
+   "from": "#d27d99",
+   "over": "#1fc9a7",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.63
+   },
+   "hex": "#90999e"
+  },
+  {
+   "from": "#5c7599",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.27
+   },
+   "hex": "#152b4a"
+  },
+  {
+   "from": "#d2555c",
+   "over": "#f19c39",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.18
+   },
+   "hex": "#eb8f3f"
+  },
+  {
+   "from": "#2812af",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.36
+   },
+   "hex": "#000000"
+  },
+  {
+   "from": "#303633",
+   "over": "#ea4d78",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.99
+   },
+   "hex": "#323634"
+  },
+  {
+   "from": "#f13193",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.18
+   },
+   "hex": "#a7005e"
+  },
+  {
+   "from": "#508fbb",
+   "over": "#71613f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.53
+   },
+   "hex": "#607981"
+  },
+  {
+   "from": "#f537cb",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.13
+   },
+   "hex": "#ff93e3"
+  },
+  {
+   "from": "#fc00d2",
+   "over": "#bd8707",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.39
+   },
+   "hex": "#d65256"
+  },
+  {
+   "from": "#a82e91",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.07
+   },
+   "hex": "#c046a7"
+  },
+  {
+   "from": "#48a93a",
+   "over": "#99c87b",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.11
+   },
+   "hex": "#90c574"
+  },
+  {
+   "from": "#3683e0",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.01
+   },
+   "hex": "#3986e3"
+  },
+  {
+   "from": "#cf6030",
+   "over": "#921663",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.2
+   },
+   "hex": "#9e2559"
+  },
+  {
+   "from": "#4dba85",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.29
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#239cd6",
+   "over": "#53118f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.19
+   },
+   "hex": "#4a2b9c"
+  },
+  {
+   "from": "#c7801b",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.15
+   },
+   "hex": "#915600"
+  },
+  {
+   "from": "#ee3e00",
+   "over": "#bded04",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.16
+   },
+   "hex": "#c5d103"
+  },
+  {
+   "from": "#da6233",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.08
+   },
+   "hex": "#f67b4d"
+  },
+  {
+   "from": "#5cbaef",
+   "over": "#b019ef",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.48
+   },
+   "hex": "#8866ef"
+  },
+  {
+   "from": "#bedefb",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.2
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#b39da9",
+   "over": "#9d0d1f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.08
+   },
+   "hex": "#9f192a"
+  },
+  {
+   "from": "#2620b2",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.25
+   },
+   "hex": "#617aff"
+  },
+  {
+   "from": "#56d5b0",
+   "over": "#fdcb80",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.28
+   },
+   "hex": "#cece8d"
+  },
+  {
+   "from": "#faa26f",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.16
+   },
+   "hex": "#c4703d"
+  },
+  {
+   "from": "#a7eaf7",
+   "over": "#83bf95",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.64
+   },
+   "hex": "#9adbd4"
+  },
+  {
+   "from": "#1e6994",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.23
+   },
+   "hex": "#002945"
+  },
+  {
+   "from": "#54496d",
+   "over": "#d97dbc",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.64
+   },
+   "hex": "#845c89"
+  },
+  {
+   "from": "#468e5f",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.13
+   },
+   "hex": "#6eb785"
+  },
+  {
+   "from": "#752d70",
+   "over": "#6bb973",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.52
+   },
+   "hex": "#707071"
+  },
+  {
+   "from": "#eae8b5",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.09
+   },
+   "hex": "#cdcb99"
+  },
+  {
+   "from": "#b96c90",
+   "over": "#bf947f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.04
+   },
+   "hex": "#bf9280"
+  },
+  {
+   "from": "#902b69",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.21
+   },
+   "hex": "#44002d"
+  },
+  {
+   "from": "#9744c8",
+   "over": "#ce9639",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.45
+   },
+   "hex": "#b57179"
+  },
+  {
+   "from": "#23d89a",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.32
+   },
+   "hex": "#006d45"
+  },
+  {
+   "from": "#f93677",
+   "over": "#30ca22",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.99
+   },
+   "hex": "#f73776"
+  },
+  {
+   "from": "#c48fa2",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.17
+   },
+   "hex": "#fdc4d8"
+  },
+  {
+   "from": "#0845a2",
+   "over": "#688805",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.47
+   },
+   "hex": "#3b694f"
+  },
+  {
+   "from": "#e852db",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.25
+   },
+   "hex": "#ffddfd"
+  },
+  {
+   "from": "#d86d6d",
+   "over": "#e96f71",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.15
+   },
+   "hex": "#e66f70"
+  },
+  {
+   "from": "#2585b2",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.03
+   },
+   "hex": "#318ebc"
+  },
+  {
+   "from": "#1d1057",
+   "over": "#526380",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.5
+   },
+   "hex": "#383a6c"
+  },
+  {
+   "from": "#60131c",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.29
+   },
+   "hex": "#bd686a"
+  },
+  {
+   "from": "#0f17ce",
+   "over": "#19dca5",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.94
+   },
+   "hex": "#1023cc"
+  },
+  {
+   "from": "#1de7ef",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.37
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#b00575",
+   "over": "#f2c739",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.74
+   },
+   "hex": "#c13765"
+  },
+  {
+   "from": "#3dc020",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.04
+   },
+   "hex": "#2cb300"
+  },
+  {
+   "from": "#156604",
+   "over": "#a42d7b",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.48
+   },
+   "hex": "#5f4842"
+  },
+  {
+   "from": "#5870d9",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.04
+   },
+   "hex": "#4d64cb"
+  },
+  {
+   "from": "#4df4d6",
+   "over": "#74742c",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.95
+   },
+   "hex": "#4feece"
+  },
+  {
+   "from": "#553109",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.14
+   },
+   "hex": "#7e5733"
+  },
+  {
+   "from": "#24b2d9",
+   "over": "#51528f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.53
+   },
+   "hex": "#3985b6"
+  },
+  {
+   "from": "#7be609",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.35
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#905b80",
+   "over": "#51870f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.48
+   },
+   "hex": "#6f7245"
+  },
+  {
+   "from": "#b8e281",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.39
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#bcd4dc",
+   "over": "#da2793",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.02
+   },
+   "hex": "#d92a94"
+  },
+  {
+   "from": "#275184",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.2
+   },
+   "hex": "#608cc3"
+  },
+  {
+   "from": "#225f4b",
+   "over": "#fba17f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.26
+   },
+   "hex": "#c39071"
+  },
+  {
+   "from": "#b85f73",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.03
+   },
+   "hex": "#ae566a"
+  },
+  {
+   "from": "#007d8d",
+   "over": "#20e69b",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.89
+   },
+   "hex": "#04898f"
+  },
+  {
+   "from": "#a85fb3",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.15
+   },
+   "hex": "#793284"
+  },
+  {
+   "from": "#f3df47",
+   "over": "#36247a",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.83
+   },
+   "hex": "#d3bf50"
+  },
+  {
+   "from": "#712387",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.01
+   },
+   "hex": "#6e2084"
+  },
+  {
+   "from": "#963d18",
+   "over": "#aeaf3d",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.25
+   },
+   "hex": "#a89334"
+  },
+  {
+   "from": "#5481cc",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.38
+   },
+   "hex": "#f4fbff"
+  },
+  {
+   "from": "#5e5c24",
+   "over": "#706966",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.31
+   },
+   "hex": "#6a6552"
+  },
+  {
+   "from": "#407edc",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.1
+   },
+   "hex": "#5e9efe"
+  },
+  {
+   "from": "#c47f79",
+   "over": "#a9b5e3",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.68
+   },
+   "hex": "#bb909b"
+  },
+  {
+   "from": "#d35ec0",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.3
+   },
+   "hex": "#ffe7ff"
+  },
+  {
+   "from": "#0ff8ef",
+   "over": "#45bcf1",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.09
+   },
+   "hex": "#40c1f1"
+  },
+  {
+   "from": "#89feaf",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.28
+   },
+   "hex": "#1ea259"
+  },
+  {
+   "from": "#ecd349",
+   "over": "#fccf6f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.47
+   },
+   "hex": "#f4d15d"
+  },
+  {
+   "from": "#7e028e",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.14
+   },
+   "hex": "#4a0055"
+  },
+  {
+   "from": "#fdc091",
+   "over": "#968caf",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.33
+   },
+   "hex": "#b89da5"
+  },
+  {
+   "from": "#57ddbd",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.07
+   },
+   "hex": "#71f4d4"
+  },
+  {
+   "from": "#9c3215",
+   "over": "#2154a1",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.88
+   },
+   "hex": "#8d3626"
+  },
+  {
+   "from": "#03d2db",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.21
+   },
+   "hex": "#e5ffff"
+  },
+  {
+   "from": "#306866",
+   "over": "#701a18",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.12
+   },
+   "hex": "#682321"
+  },
+  {
+   "from": "#47a1fa",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.37
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#c14cb1",
+   "over": "#a2d3a6",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.34
+   },
+   "hex": "#ada5aa"
+  },
+  {
+   "from": "#c70dce",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.12
+   },
+   "hex": "#f14cf7"
+  },
+  {
+   "from": "#394695",
+   "over": "#22bf35",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.53
+   },
+   "hex": "#2e7f68"
+  },
+  {
+   "from": "#e5dd98",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.3
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#d11f49",
+   "over": "#59bfce",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.86
+   },
+   "hex": "#c0355c"
+  },
+  {
+   "from": "#94c391",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.09
+   },
+   "hex": "#b0e0ad"
+  },
+  {
+   "from": "#9157ef",
+   "over": "#dc2145",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.4
+   },
+   "hex": "#be3789"
+  },
+  {
+   "from": "#ff6f4a",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.06
+   },
+   "hex": "#e95b36"
+  },
+  {
+   "from": "#8a7b13",
+   "over": "#f7cd69",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.61
+   },
+   "hex": "#b59b35"
+  },
+  {
+   "from": "#5a25af",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.4
+   },
+   "hex": "#c9bbff"
+  },
+  {
+   "from": "#3f2900",
+   "over": "#ae34d0",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.21
+   },
+   "hex": "#9732a4"
+  },
+  {
+   "from": "#71cbb3",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.23
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#511727",
+   "over": "#aea05f",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.65
+   },
+   "hex": "#72473b"
+  },
+  {
+   "from": "#1cdaac",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.12
+   },
+   "hex": "#00b089"
+  },
+  {
+   "from": "#191bf0",
+   "over": "#e97849",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.83
+   },
+   "hex": "#3c2bd4"
+  },
+  {
+   "from": "#35dc8c",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.39
+   },
+   "hex": "#00592f"
+  },
+  {
+   "from": "#33d927",
+   "over": "#3c19e0",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.63
+   },
+   "hex": "#36926b"
+  },
+  {
+   "from": "#e7602c",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.26
+   },
+   "hex": "#ffd4c1"
+  },
+  {
+   "from": "#43c90d",
+   "over": "#e404b3",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.07
+   },
+   "hex": "#d912a7"
+  },
+  {
+   "from": "#d9be87",
+   "rule": {
+    "kind": "lightness",
+    "lightness": 0.31
+   },
+   "hex": "#ffffff"
+  },
+  {
+   "from": "#c6a1ae",
+   "over": "#0a6e92",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.19
+   },
+   "hex": "#2e7897"
+  },
+  {
+   "from": "#b9101e",
+   "rule": {
+    "kind": "lightness",
+    "lightness": -0.26
+   },
+   "hex": "#430004"
+  },
+  {
+   "from": "#e289a8",
+   "over": "#e5e035",
+   "rule": {
+    "kind": "mix",
+    "weight": 0.01
+   },
+   "hex": "#e5df36"
+  }
+ ]
+}

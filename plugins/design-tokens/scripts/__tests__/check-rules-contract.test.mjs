@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { contractProblems, frontMatterText } from "../check-rules-contract.mjs";
-import { TOKEN_DEFAULTS } from "../project-modules.mjs";
+import { TOKEN_DEFAULTS } from "../lib/project-modules.mjs";
 
 const tokenIds = new Set(["color.surface", "color.on-surface", "typography.body-md", "rounded.md", "palette.gray-1"]);
 const valid = {

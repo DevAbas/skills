@@ -9,7 +9,7 @@ description: >-
   project, and writes only its report.
 license: MIT
 compatibility: Claude Code, as part of the design-tokens plugin. Node.js 20 or later.
-allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs *) Bash(date -u *) Read Grep Glob
+allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/check-tokens.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs *) Bash(date -u *) Read Grep Glob
 hooks:
   PreToolUse:
     - matcher: "Bash|Glob|Grep"
@@ -54,7 +54,17 @@ It lists:
 
 If the scan fails, read the project directly and say so in the report. Do not block on the script.
 
-## Step 2: Run the project's existing checks
+## Step 2: Run the deterministic checks
+
+When the project has DTCG token files, run the plugin's token check. It is read-only, needs no dependency, and reads the settings from `design-tokens.gates.json` when the project has one:
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/scripts/check-tokens.mjs --root .
+```
+
+Its lines, each prefixed with a rule id, are evidence for the `format` and `tiers` findings. A non-zero exit means it found problems; that is a result, not a failure of the audit.
+
+### The project's existing checks
 
 If the project already has token checks, run them and keep their output as evidence. These can be package scripts that check tokens, rules or generated outputs, or `npx tz check` when Terrazzo is installed.
 
@@ -66,7 +76,7 @@ If the project already has token checks, run them and keep their output as evide
 Start the read-only auditor, `design-tokens:token-auditor`, with a prompt that contains:
 - the project root;
 - the scan's JSON;
-- the output of step 2, if any.
+- the output of step 2: the token check and the project's own checks, if any.
 
 The auditor reads the rubric, checks every rule, and returns one JSON object: `stack`, `parts`, `findings`, `gates` and `sources`. Its context is its own, so a large project does not fill this conversation.
 

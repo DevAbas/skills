@@ -80,7 +80,7 @@ Each rule block has five fields:
 - **What:** palette entries are literal values, never aliases.
 - **Why:** principles 2.
 - **Check (core):** in the palette group, flag any `$value` that is a reference (`{…}` or `$ref`).
-- **Gate:** token check (profile).
+- **Gate:** token check (`scripts/check-tokens.mjs`, no dependencies).
 - **Default:** `error`.
 
 ### `tiers/role-aliases-palette`
@@ -92,7 +92,7 @@ Each rule block has five fields:
 - **Check (core):**
   - resolve each context;
   - for each role, the first step of its alias chain must be a palette id, or the token must carry a derived rule in `$extensions`.
-- **Gate:** token check (profile).
+- **Gate:** token check (`scripts/check-tokens.mjs`, no dependencies).
 - **Default:** `error`.
 
 ### `tiers/derived-rule-recorded`
@@ -113,7 +113,7 @@ Each rule block has five fields:
 - **What:** a composite style (typography) takes its family and weight from the foundation's font tokens, never from literals.
 - **Why:** principles 2 and 6; decisions, Text styles.
 - **Check (core):** read the authored `$value` of each text style. `fontFamily` and `fontWeight` must be references.
-- **Gate:** token check (profile).
+- **Gate:** token check (`scripts/check-tokens.mjs`, no dependencies).
 - **Default:** `warning`.
 
 ### `tiers/no-primitive-in-code`
@@ -168,7 +168,7 @@ Each rule block has five fields:
 - **What:** every context defines the same roles, and a role is derived the same way in each.
 - **Why:** principles 3.
 - **Check (core):** compare the role ids per context (resolver contexts, or per-theme files).
-- **Gate:** token check (profile).
+- **Gate:** token check (`scripts/check-tokens.mjs`, no dependencies).
 - **Default:** `error`.
 
 ### `format/single-source-build`

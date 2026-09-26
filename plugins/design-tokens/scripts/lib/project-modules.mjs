@@ -1,7 +1,8 @@
-// What the profile's checks share: the token settings from the project's
+// What the checks share: the token settings from the project's
 // design-tokens.gates.json (`tokens`), and loading a package from the
 // project's own node_modules, so a check runs with the versions the project
-// installed wherever the check file lives. No dependencies, Node 20 or later.
+// installed wherever the check file lives. Only the rules document's check
+// needs one (`yaml`); the token checks need none. No dependencies, Node 20 or later.
 
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -12,6 +13,8 @@ import { pathToFileURL } from "node:url";
 export const TOKEN_DEFAULTS = {
   /** The DTCG resolver, relative to the root. */
   resolver: "tokens/design.resolver.json",
+  /** Plain token files, merged in this order, for a project without a resolver. */
+  files: [],
   /** The resolver modifier whose contexts are the themes. */
   modifier: "theme",
   /** The group of literal values (the palette). */

@@ -11,14 +11,14 @@
 //
 // Terrazzo's header names the template relative to the output folder, which
 // differs for the temporary build, so that line is ignored. The output folder
-// comes from design-tokens.gates.json (`tokens.outDir`, project-modules.mjs).
+// comes from design-tokens.gates.json (`tokens.outDir`, lib/project-modules.mjs).
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { tokenSettings } from "./project-modules.mjs";
+import { tokenSettings } from "../../lib/project-modules.mjs";
 
 /** A generated file without the header line that names the template's relative path. */
 export const comparable = (css) => css.replace(/^ \*\s+template: .*$/m, "");

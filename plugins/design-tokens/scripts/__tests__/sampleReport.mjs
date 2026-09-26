@@ -44,7 +44,7 @@ export function sampleReport() {
         does: "Fails a role that does not alias the palette",
         checks: ["tiers/role-aliases-palette", "format/themes-complete"],
         closes: ["tiers/role-aliases-palette@tokens/themes/dark.tokens.json#color.surface-overlay"],
-        tool: { name: "check-tokens.mjs", kind: "custom", basis: "assets/harness/terrazzo-tailwind-v4/check-tokens.mjs" },
+        tool: { name: "check-tokens.mjs", kind: "custom", basis: "scripts/check-tokens.mjs" },
         runs: ["agent-edit", "commit", "ci"],
         status: "missing",
       },

@@ -77,34 +77,39 @@ Write `design-tokens.gates.json` at the project root, starting from `${CLAUDE_PL
 - `onSourceEdit`: commands run after such an edit;
 - `lint`: `files` and `command`, for the linter an edited file gets, and `strictEnv`, the variables that make its rules errors;
 - `beforeCommit`: the commands every commit and CI run;
-- `tokens` (profile checks): `resolver`, `modifier`, `palette`, `roles`, `typography`, `fonts`, `extensionKey`, `outDir`, `rulesDocument` and `readable`. Defaults are in `assets/harness/terrazzo-tailwind-v4/project-modules.mjs`.
+- `tokens` (profile checks): `resolver`, `modifier`, `palette`, `roles`, `typography`, `fonts`, `extensionKey`, `outDir`, `rulesDocument` and `readable`. `files` lists plain token files for a project without a resolver. Defaults are in `${CLAUDE_PLUGIN_ROOT}/scripts/lib/project-modules.mjs`.
 
 Every path and command in it is the project's own. None is copied from the example.
 
-## Step 3: Custom checks (profile)
+## Step 3: Checks
 
-For the Terrazzo + Tailwind v4 profile, the assets in `${CLAUDE_PLUGIN_ROOT}/assets/harness/terrazzo-tailwind-v4/` are the starting point:
+**Token and rules checks (any stack, no dependencies).** Copy them from the plugin into a folder the project chooses, for example `scripts/design-tokens/`, keeping their layout so the relative imports hold:
 
-| Asset | Rules |
+| File | Rules |
 |---|---|
-| `check-tokens.mjs` | Palette literal, roles alias the palette or are derived, derived values match their rule, every context complete, text styles alias the fonts |
-| `check-rules-contract.mjs` | The rules document's front matter holds no values, imports the resolver, and its contract names existing roles |
-| `check-generated.mjs` | Generated outputs match a fresh build |
-| `eslint-token-rules.mjs` | `token-classes` and `no-raw-color` |
-| `project-modules.mjs` | What the checks share |
-| `terrazzo.config.ts`, `theme.template.css` | The build, when the project has none |
+| `scripts/check-tokens.mjs` | DTCG validity (a modifier needs two or more contexts), palette literal, roles alias the palette or are derived, derived values match their rule, every context complete, text styles alias the fonts |
+| `scripts/check-rules-contract.mjs` | The rules document's front matter holds no values, imports the resolver, and its contract names existing roles. It reads the front matter with the project's `yaml` |
+| `scripts/lib/dtcg.mjs`, `lib/color.mjs`, `lib/project-modules.mjs` | The DTCG reader, the colour maths and the shared settings the checks use |
 
-Copy them to a folder the project chooses, for example `scripts/design-tokens/`, and adapt them:
-- **Read the asset first**, and keep its comments, which say what each rule does and why.
-- **Adapt only what the project needs:** names, paths, the class helpers the code uses, the utilities it has.
-- **Write a unit test** for each pure function you change, in the project's test framework, with a negative case: the input the rule must reject.
-- **Ask before dependencies.** A check needs the project's own packages (`@terrazzo/parser`, `yaml`, `lightningcss`). Ask before adding any.
+**Profile checks (Terrazzo + Tailwind v4).**
+
+| File | Rules |
+|---|---|
+| `scripts/profiles/terrazzo-tailwind-v4/check-generated.mjs` | Generated outputs match a fresh build, and none is empty |
+| `assets/harness/terrazzo-tailwind-v4/eslint-token-rules.mjs` | `token-classes` and `no-raw-color` |
+| `assets/harness/terrazzo-tailwind-v4/terrazzo.config.ts`, `theme.template.css` | The build, when the project has none |
+
+**When you adapt a copied file:**
+- **Read the file first**, and keep its comments, which say what each rule does and why.
+- **Change only what the project needs:** names, paths, the class helpers the code uses, the utilities it has. Settings belong in `design-tokens.gates.json`, not in the copied code.
+- **Test what you change.** Write a unit test for each pure function you change, in the project's test framework, with a negative case: the input the rule must reject.
+- **Ask before dependencies.** Only `check-rules-contract.mjs` (`yaml`) and the profile's build and lint (Terrazzo, ESLint) need packages. Ask before adding any.
 
 Wire the checks into the project's scripts, for example a `tokens:check` script, and into `beforeCommit` and `onSourceEdit`. Add the ESLint rules to the project's flat config in two severities:
 - `recommended` (warn) for a person;
 - `strict` (error) when `DESIGN_LINT_STRICT=1` or `CI=true`.
 
-For a stack without a profile, write the same rules for its tools. Follow the same order: existing rule first, custom rule as a plugin of an existing tool second, a standalone script last.
+For a stack without a profile, the token and rules checks work as they are. Write the code lint and the build check for that stack's own tools. Follow the same order: existing rule first, custom rule as a plugin of an existing tool second, a standalone script last.
 
 ## Step 4: Hooks, pre-commit, CI (core)
 

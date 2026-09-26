@@ -107,13 +107,13 @@ Present the plan and wait for approval. Use plan mode when the session offers it
 After approval:
 1. Write the token files, then the rules document, then the build config.
 2. Generate the palette with the chosen generator, and record its version and seeds.
-3. Compute each derived role's value per context with the rule, and store it. `check-tokens.mjs` recomputes them.
+3. Compute each derived role's value per context with the rule, and store it. `${CLAUDE_PLUGIN_ROOT}/scripts/check-tokens.mjs` recomputes them.
 4. Install the approved dependencies and run the build.
 5. Wire the project's global CSS to the generated outputs, following the profile.
 
 ## Step 5: Verify
 
-Run the checks the harness will install. Where the harness has not run yet, run the profile's asset scripts directly from `${CLAUDE_PLUGIN_ROOT}/assets/harness/terrazzo-tailwind-v4/` with the project as the working directory:
+Run the checks the harness will install. Where the harness has not run yet, run the plugin's checks directly, with the project as the working directory: `${CLAUDE_PLUGIN_ROOT}/scripts/check-tokens.mjs` and `check-rules-contract.mjs`, and `scripts/profiles/terrazzo-tailwind-v4/check-generated.mjs`:
 - the token check;
 - the rules contract check;
 - the generated-output check;

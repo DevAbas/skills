@@ -10,14 +10,15 @@
 //
 //   node check-rules-contract.mjs        exit 1 and one line per problem
 //
-// Reads the front matter with the project's `yaml` and the token ids with the
-// project's @terrazzo/parser. The settings come from design-tokens.gates.json
-// (`tokens`, project-modules.mjs).
+// Reads the front matter with the project's `yaml`, and the token ids with the
+// plugin's own DTCG reader (lib/dtcg.mjs). The settings come from
+// design-tokens.gates.json (`tokens`, lib/project-modules.mjs).
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { importFromProject, tokenSettings } from "./project-modules.mjs";
+import { readProjectTokens } from "./check-tokens.mjs";
+import { importFromProject, tokenSettings } from "./lib/project-modules.mjs";
 
 /** The keys a rules document's front matter may hold: identity, the import, the contract. */
 export const ALLOWED_KEYS = ["version", "name", "description", "imports", "components"];
@@ -35,7 +36,7 @@ export function frontMatterText(markdown) {
  * Every broken contract rule, one sentence each, prefixed with its rubric rule id.
  * @param {Record<string, unknown>} front the parsed front matter
  * @param {ReadonlySet<string>} tokenIds every token id in the tokens (`color.primary`)
- * @param {typeof import("./project-modules.mjs").TOKEN_DEFAULTS} settings
+ * @param {typeof import("./lib/project-modules.mjs").TOKEN_DEFAULTS} settings
  */
 export function contractProblems(front, tokenIds, settings) {
   const problems = [];
@@ -67,16 +68,18 @@ async function main() {
   const root = process.cwd();
   const settings = tokenSettings(root);
   const { parse: parseYaml } = await importFromProject("yaml", root);
-  const { defineConfig, parse } = await importFromProject("@terrazzo/parser", root);
   const markdown = readFileSync(join(root, settings.rulesDocument), "utf8");
   const yaml = frontMatterText(markdown);
   if (yaml === undefined) {
     console.error(`docs/rules-reference-existing-tokens: ${settings.rulesDocument} has no front matter; it needs \`imports:\` and the \`components:\` contract`);
     return 1;
   }
-  const filename = pathToFileURL(join(root, settings.resolver));
-  const { resolver } = await parse([{ filename, src: readFileSync(filename, "utf8") }], { config: defineConfig({}, { cwd: pathToFileURL(`${root}/`) }) });
-  const tokenIds = new Set(Object.keys(resolver.apply({})));
+  const { contexts, problems: tokenProblems } = readProjectTokens(root, settings);
+  if (tokenProblems.length > 0) {
+    console.error(`The tokens cannot be read:\n${tokenProblems.map((problem) => `  - ${problem}`).join("\n")}`);
+    return 1;
+  }
+  const tokenIds = new Set(Object.values(contexts).flatMap((tokens) => Object.keys(tokens)));
   const problems = contractProblems(parseYaml(yaml) ?? {}, tokenIds, settings);
   if (problems.length > 0) {
     console.error(`${settings.rulesDocument} breaks the rules document's contract:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);

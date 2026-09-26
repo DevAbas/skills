@@ -1,31 +1,34 @@
 #!/usr/bin/env node
 // The tier rules DTCG leaves to a team ("leaving organizational strategy to
 // design system teams", https://www.designtokens.org/faq/), checked on every
-// context the resolver declares:
+// context the resolver declares, and the token files checked against the
+// format itself:
 //
+// - format/dtcg-valid: what the reader finds wrong with the files or the
+//   resolver (lib/dtcg.mjs), including a modifier with fewer than two contexts;
 // - tiers/palette-literal: a palette entry is a colour value, never an alias;
 // - tiers/role-aliases-palette: a colour role points to the palette itself,
 //   not to another role and not a literal, or it is derived;
 // - tiers/derived-rule-recorded: a derived role records its rule under the
 //   project's `$extensions` key, and its value is what the rule gives in that
-//   context;
+//   context (lib/color.mjs);
 // - format/themes-complete: every context defines the same roles, derived the
 //   same way;
 // - tiers/styles-alias-foundation: a text style's family and weight alias the
 //   font group.
 //
-//   node check-tokens.mjs        exit 1 and one line per problem when a rule breaks
+//   node check-tokens.mjs [--root <project>]   exit 1 and one line per problem
 //
-// Reads the resolver with the project's @terrazzo/parser and computes derived
-// colours with the project's lightningcss (a Tailwind v4 dependency). The
-// settings come from design-tokens.gates.json (`tokens`, project-modules.mjs).
-// Why a script and not a Terrazzo lint rule: a lint rule receives one resolved
-// token set, and these rules need every context.
+// No dependencies: it runs from the plugin on any project with DTCG files, and
+// the same file runs from a project that copied it. The settings come from the
+// project's design-tokens.gates.json (`tokens`, lib/project-modules.mjs).
 
-import { readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { importFromProject, tokenSettings } from "./project-modules.mjs";
+import { colorHex, derivedHex } from "./lib/color.mjs";
+import { loadResolver, loadTokenFiles, modifiersOf, resolveTokens } from "./lib/dtcg.mjs";
+import { tokenSettings } from "./lib/project-modules.mjs";
 
 /**
  * The derived rule a token records, undefined when it has none, or a string saying why the rule is malformed.
@@ -41,22 +44,22 @@ export function derivedRuleOf(extensions, key) {
   return `malformed derived rule ${JSON.stringify(rule)}: expected { kind: "lightness", from, lightness } or { kind: "mix", from, weight, over }`;
 }
 
-/** The rule as a CSS colour, the roles it reads resolved to hex; lightningcss resolves it to sRGB. */
-export function ruleCss(rule, roleHex) {
-  if (rule.kind === "lightness") return `oklch(from ${roleHex(rule.from)} calc(l ${rule.lightness < 0 ? "-" : "+"} ${Math.abs(rule.lightness)}) c h)`;
-  return `color-mix(in srgb, ${roleHex(rule.from)} ${Math.round(rule.weight * 100)}%, ${roleHex(rule.over)})`;
-}
-
-const hexOf = (value) => String(value?.hex ?? "").toLowerCase();
+const hexOf = (value) => {
+  try {
+    return colorHex(value);
+  } catch {
+    return "";
+  }
+};
 const inGroup = (tokens, group) => Object.entries(tokens).filter(([id]) => id.startsWith(`${group}.`)).map(([id, token]) => [id.slice(group.length + 1), token]);
 
 /**
  * Every broken tier rule, one sentence each, prefixed with its rubric rule id.
- * @param {Record<string, Record<string, any>>} contexts context name → resolved tokens (id → @terrazzo/parser normalized token)
- * @param {typeof import("./project-modules.mjs").TOKEN_DEFAULTS} settings
- * @param {(rule: object, roleHex: (role: string) => string) => string} derive the hex a rule gives
+ * @param {Record<string, Record<string, any>>} contexts context name → resolved tokens (lib/dtcg.mjs resolveTokens)
+ * @param {typeof import("./lib/project-modules.mjs").TOKEN_DEFAULTS} settings
+ * @param {(rule: object, roleHex: (role: string) => string) => string} [derive] the hex a rule gives
  */
-export function tierProblems(contexts, settings, derive) {
+export function tierProblems(contexts, settings, derive = derivedHex) {
   const problems = [];
   const names = Object.keys(contexts);
   const first = contexts[names[0]] ?? {};
@@ -124,41 +127,40 @@ export function tierProblems(contexts, settings, derive) {
   return problems;
 }
 
-async function main() {
-  const root = process.cwd();
+/**
+ * The project's tokens, read through its resolver (or its plain token files), resolved once per context of the
+ * theme modifier; and every problem the reader found, as format/dtcg-valid.
+ */
+export function readProjectTokens(root, settings) {
+  const resolverPath = join(root, settings.resolver);
+  let source;
+  if (existsSync(resolverPath)) source = loadResolver(resolverPath);
+  else if (settings.files.length > 0) source = loadTokenFiles(settings.files.map((file) => join(root, file)));
+  else return { contexts: {}, problems: [`format/dtcg-valid: no resolver at ${settings.resolver}; set tokens.resolver, or tokens.files for plain token files, in design-tokens.gates.json`] };
+  const contextNames = modifiersOf(source)[settings.modifier]?.contexts ?? [];
+  const inputs = contextNames.length > 0 ? contextNames.map((context) => [context, { [settings.modifier]: context }]) : [["default", {}]];
+  const problems = new Set();
+  const contexts = {};
+  for (const [name, input] of inputs) {
+    const { tokens, problems: found } = resolveTokens(source, input);
+    contexts[name] = tokens;
+    for (const problem of found) problems.add(`format/dtcg-valid: ${problem}`);
+  }
+  return { contexts, problems: [...problems] };
+}
+
+function main(argv) {
+  const at = argv.indexOf("--root");
+  const root = at === -1 ? process.cwd() : argv[at + 1];
   const settings = tokenSettings(root);
-  const { defineConfig, parse } = await importFromProject("@terrazzo/parser", root);
-  const { transform } = await importFromProject("lightningcss", root);
-  const filename = pathToFileURL(join(root, settings.resolver));
-  const source = readFileSync(filename, "utf8");
-  const document = JSON.parse(source);
-  const contextNames = Object.keys(document.modifiers?.[settings.modifier]?.contexts ?? {});
-  const { resolver } = await parse([{ filename, src: source }], { config: defineConfig({}, { cwd: pathToFileURL(`${root}/`) }) });
-  const contexts = contextNames.length > 0
-    ? Object.fromEntries(contextNames.map((context) => [context, resolver.apply({ [settings.modifier]: context })]))
-    : { default: resolver.apply({}) };
-
-  const derive = (rule, roleHex) => {
-    // A target without relative colours or color-mix makes lightningcss resolve the value to a hex fallback.
-    const { code } = transform({ filename: "derived.css", code: Buffer.from(`a{color:${ruleCss(rule, roleHex)}}`), targets: { chrome: 80 << 16 } });
-    const hex = /color:\s*(#[0-9a-f]{3,8})\b/i.exec(code.toString())?.[1];
-    if (!hex) throw new Error(`lightningcss did not resolve ${ruleCss(rule, roleHex)} to a hex colour`);
-    const digits = hex.slice(1).toLowerCase();
-    return `#${digits.length === 3 ? [...digits].map((d) => d + d).join("") : digits}`;
-  };
-
-  const problems = tierProblems(contexts, settings, derive);
+  const { contexts, problems: formatProblems } = readProjectTokens(root, settings);
+  const problems = [...formatProblems, ...(Object.keys(contexts).length > 0 ? tierProblems(contexts, settings) : [])];
   if (problems.length > 0) {
-    console.error(`The tokens break the tier rules:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
+    console.error(`The tokens break the rules:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
     return 1;
   }
-  console.log(`check-tokens: the tier rules hold in ${Object.keys(contexts).join(", ")}`);
+  console.log(`check-tokens: the format and tier rules hold in ${Object.keys(contexts).join(", ")}`);
   return 0;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().then((code) => (process.exitCode = code), (error) => {
-    console.error(error.message);
-    process.exitCode = 1;
-  });
-}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) process.exitCode = main(process.argv.slice(2));

@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { derivedRuleOf, ruleCss, tierProblems } from "../check-tokens.mjs";
-import { TOKEN_DEFAULTS } from "../project-modules.mjs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { derivedRuleOf, readProjectTokens, tierProblems } from "../check-tokens.mjs";
+import { TOKEN_DEFAULTS } from "../lib/project-modules.mjs";
 
 const settings = { ...TOKEN_DEFAULTS, extensionKey: "com.example.design" };
 const color = (hex, extra = {}) => ({ $type: "color", $value: { hex }, ...extra });
@@ -32,13 +35,6 @@ describe("derivedRuleOf", () => {
   it("names a malformed rule instead of accepting it", () => {
     assert.match(derivedRuleOf({ k: { derived: { kind: "mix", from: "a", weight: 1.5, over: "b" } } }, "k"), /^malformed derived rule/);
     assert.match(derivedRuleOf({ k: { derived: { kind: "darken", from: "a" } } }, "k"), /^malformed derived rule/);
-  });
-});
-
-describe("ruleCss", () => {
-  it("writes a relative OKLCH colour or a color-mix", () => {
-    assert.equal(ruleCss(hoverRule, () => "#00aa88"), "oklch(from #00aa88 calc(l - 0.07) c h)");
-    assert.equal(ruleCss({ kind: "mix", from: "a", weight: 0.6, over: "b" }, (role) => (role === "a" ? "#111111" : "#ffffff")), "color-mix(in srgb, #111111 60%, #ffffff)");
   });
 });
 
@@ -79,5 +75,59 @@ describe("tierProblems", () => {
     const tokens = contexts();
     tokens.light["typography.body"].originalValue.$value.fontFamily = ["Inter", "sans-serif"];
     assert.deepEqual(tierProblems(tokens, settings, derive), ["tiers/styles-alias-foundation: typography.body.fontFamily is a literal; a text style takes its fontFamily from font.*"]);
+  });
+});
+
+describe("readProjectTokens", () => {
+  const write = (files) => {
+    const root = mkdtempSync(join(tmpdir(), "design-tokens-check-"));
+    for (const [file, content] of Object.entries(files)) {
+      mkdirSync(dirname(join(root, file)), { recursive: true });
+      writeFileSync(join(root, file), JSON.stringify(content));
+    }
+    return root;
+  };
+  const palette = { palette: { $type: "color", "gray-1": { $value: { colorSpace: "srgb", components: [0.99, 0.99, 0.99], hex: "#fcfcfc" } }, "gray-12": { $value: { colorSpace: "srgb", components: [0.07, 0.07, 0.07], hex: "#111111" } } } };
+  const theme = (surface) => ({ color: { $type: "color", surface: { $value: `{palette.${surface}}` } } });
+
+  it("resolves each context of the theme modifier, and the tier rules pass on them", () => {
+    const root = write({
+      "tokens/palette.tokens.json": palette,
+      "tokens/light.tokens.json": theme("gray-1"),
+      "tokens/dark.tokens.json": theme("gray-12"),
+      "tokens/design.resolver.json": { version: "2025.10", sets: { base: { sources: [{ $ref: "palette.tokens.json" }] } }, modifiers: { theme: { contexts: { light: [{ $ref: "light.tokens.json" }], dark: [{ $ref: "dark.tokens.json" }] }, default: "light" } }, resolutionOrder: [{ $ref: "#/sets/base" }, { $ref: "#/modifiers/theme" }] },
+    });
+    try {
+      const { contexts, problems } = readProjectTokens(root, settings);
+      assert.deepEqual(problems, []);
+      assert.deepEqual(Object.keys(contexts), ["light", "dark"]);
+      assert.deepEqual(contexts.dark["color.surface"].aliasChain, ["palette.gray-12"]);
+      assert.deepEqual(tierProblems(contexts, settings), []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("reports a modifier with one context as format/dtcg-valid", () => {
+    const root = write({
+      "tokens/palette.tokens.json": palette,
+      "tokens/dark.tokens.json": theme("gray-12"),
+      "tokens/design.resolver.json": { version: "2025.10", sets: { base: { sources: [{ $ref: "palette.tokens.json" }] } }, modifiers: { theme: { contexts: { dark: [{ $ref: "dark.tokens.json" }] }, default: "dark" } }, resolutionOrder: [{ $ref: "#/sets/base" }, { $ref: "#/modifiers/theme" }] },
+    });
+    try {
+      const { problems } = readProjectTokens(root, settings);
+      assert.ok(problems.some((problem) => problem.startsWith("format/dtcg-valid: modifier theme declares 1 context")), problems.join("\n"));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("says where to point it when there is no resolver and no files", () => {
+    const root = write({});
+    try {
+      assert.match(readProjectTokens(root, settings).problems[0], /no resolver at tokens\/design.resolver.json/);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

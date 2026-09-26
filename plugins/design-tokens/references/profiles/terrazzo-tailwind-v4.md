@@ -49,24 +49,24 @@ Paths are the project's choice. Record them once, in the gates config (`design-t
 
 ## Checks and gates per rule
 
-| Rule | Existing tool first | Custom (asset) |
+| Rule | Existing tool first | Plugin check |
 |---|---|---|
 | `format/dtcg-valid` | `tz check`, which checks the files and runs the lint rules | none |
 | `naming/consistent-case` | Terrazzo `core/consistent-naming` (`["error", { format: "kebab-case" }]`) | none |
 | `docs/token-descriptions` | Terrazzo `core/descriptions`, with `ignore` for the palette | none |
-| Contrast pairs (rules document) | Terrazzo `a11y/min-contrast` with `pairs`. Confirm whether it checks every resolver context or only the default one | `check-tokens.mjs` covers each context if not |
-| `tiers/palette-literal`, `tiers/role-aliases-palette`, `tiers/derived-rule-recorded`, `tiers/styles-alias-foundation`, `format/themes-complete` | none: DTCG leaves tier rules to the team | `check-tokens.mjs`: parses the resolver with `@terrazzo/parser`, applies every context, checks the tiers, recomputes derived values with lightningcss (a Tailwind v4 dependency) |
-| `tiers/components-read-roles`, `docs/rules-hold-no-values`, `docs/rules-reference-existing-tokens` | @google/design.md `lint` on a document composed in memory (until `imports:` is supported) | `check-rules-contract.mjs`: front matter keys, `imports:`, every contract reference is a known role |
-| `tiers/no-primitive-in-code`, `tiers/no-literal-in-code` | Tailwind's theme mapping and the palette reset | `eslint-token-rules.mjs`: `token-classes` (a token utility must name a token the generated theme defines; no arbitrary values, no modifiers, no palette variables) and `no-raw-color` (no hex or literal colour functions in source) |
-| `format/single-source-build` | `tz build` | `check-generated.mjs`: builds into a temporary folder and compares with the committed outputs. `protect-generated.mjs` (core hook) denies an agent's edit to an output |
+| Contrast pairs (rules document) | Terrazzo `a11y/min-contrast` with `pairs`. Confirm whether it checks every resolver context or only the default one | `scripts/check-tokens.mjs` resolves each context, if contrast needs checking per context |
+| `tiers/palette-literal`, `tiers/role-aliases-palette`, `tiers/derived-rule-recorded`, `tiers/styles-alias-foundation`, `format/themes-complete` | none: DTCG leaves tier rules to the team | `scripts/check-tokens.mjs`: reads the resolver with the plugin's own DTCG reader (`scripts/lib/dtcg.mjs`), resolves every context, checks the tiers, and recomputes derived values (`scripts/lib/color.mjs`). No dependencies |
+| `tiers/components-read-roles`, `docs/rules-hold-no-values`, `docs/rules-reference-existing-tokens` | @google/design.md `lint` on a document composed in memory (until `imports:` is supported) | `scripts/check-rules-contract.mjs`: front matter keys, `imports:`, every contract reference is a known role. It reads the front matter with the project's `yaml` |
+| `tiers/no-primitive-in-code`, `tiers/no-literal-in-code` | Tailwind's theme mapping and the palette reset | `assets/harness/terrazzo-tailwind-v4/eslint-token-rules.mjs`: `token-classes` (a token utility must name a token the generated theme defines; no arbitrary values, no modifiers, no palette variables) and `no-raw-color` (no hex or literal colour functions in source) |
+| `format/single-source-build` | `tz build` | `scripts/profiles/terrazzo-tailwind-v4/check-generated.mjs`: builds into a temporary folder, compares with the committed outputs, and fails an output with no tokens. `protect-generated.mjs` (core hook) denies an agent's edit to an output |
 
-**Why the tier rules are a script, not a Terrazzo lint rule:** a Terrazzo lint rule receives one resolved token set (`LintRuleContext.tokens`). The tier and completeness rules need every context of the resolver, which `parse(...).resolver.apply(input)` gives. Before copying `check-tokens.mjs`, confirm this in the installed version's types. If a later version lints each context, a lint rule is the better home (principles 9).
+**Why the tier rules are the plugin's own script, not a Terrazzo lint rule:** a Terrazzo lint rule receives one resolved token set (`LintRuleContext.tokens`), and the tier and completeness rules need every context. The plugin's DTCG reader and colour maths also make the check independent of the build tool, so it runs the same way on a project that builds with Terrazzo, Style Dictionary or nothing. Its results match Terrazzo's resolved values and lightningcss's derived colours (verified on a real token set, and by `scripts/lib/__tests__`).
 
 ## Wiring the checks
 
 The project's `package.json` gets two scripts; the names are the project's choice, and are recorded in `design-tokens.gates.json`:
 - `tokens:build`: runs `tz build`;
-- `tokens:check`: runs `check-tokens.mjs`, then `check-rules-contract.mjs`, then `check-generated.mjs`, then `tz check`.
+- `tokens:check`: runs the copied `check-tokens.mjs`, then `check-rules-contract.mjs`, then `check-generated.mjs`, then `tz check`.
 
 The ESLint rules join the project's flat config twice, once in each severity (`decisions.md`, Gate severity):
 - `recommended`: `warn`;
@@ -75,11 +75,11 @@ The ESLint rules join the project's flat config twice, once in each severity (`d
 ## Dependencies this profile adds
 
 Ask before adding each one:
-- `@terrazzo/cli`, `@terrazzo/parser`, `@terrazzo/plugin-css`, `@terrazzo/plugin-tailwind`;
+- `@terrazzo/cli`, `@terrazzo/parser`, `@terrazzo/plugin-css`, `@terrazzo/plugin-tailwind`, for the build (the config imports `RECOMMENDED_CONFIG` from `@terrazzo/parser`);
 - `yaml`, which the contract check uses to read the front matter;
 - `@google/design.md`, only when the project wants its contrast and structure lint.
 
-`lightningcss` comes with Tailwind v4. Confirm it resolves before relying on it (`node -e "import('lightningcss')"`).
+The token check needs none of them.
 
 ## Pitfalls
 
@@ -87,8 +87,8 @@ Found while migrating a real project, and confirmed in Terrazzo 2.7.1. Re-check 
 
 - **`lint.rules` replaces the recommended rules.** Terrazzo applies its recommended set only when `lint.rules` is undefined, so a config that sets any rule runs only those rules. Spread the recommended set first: `rules: { ...RECOMMENDED_CONFIG, … }`, with `RECOMMENDED_CONFIG` from `@terrazzo/parser`. The template config does this.
 - **A relative template path resolves against `outDir`, not the project root.** The build then fails with "Could not locate template". Pass the path through `resolve()`, as the template config does.
-- **One context still gets a modifier.** For a single theme, give the resolver one modifier with one context (`"theme": { "contexts": { "dark": [...] }, "default": "dark" }`) and write `@tz(theme: "dark")`.
-  - A resolver without a modifier builds with `@tz(tzMode: ".")`, but `tzMode` is Terrazzo's internal modifier name, not a documented argument.
+- **One context is a set, not a modifier.** A modifier must declare two or more contexts (Resolver §4.1.5.1; the resolver schema's `minProperties: 2`), so a single theme goes in a set, and the resolver has no modifier. Terrazzo accepts a one-context modifier, but the file is not valid DTCG, and `check-tokens.mjs` reports it.
+  - With no modifier, the template uses `@tz(tzMode: ".")`: Terrazzo documents `tzMode` as its virtual modifier for tokens without resolver modifiers, and warns against mixing it with resolver modifiers.
   - A missing or wrong argument (`@tz()`, `@tz(tzMode: "nope")`) builds an empty `@theme` with exit 0 and only a "matched 0 tokens" warning. `check-generated.mjs` fails on an output with no tokens for this reason.
 - **A DTCG `lineHeight` is a unitless ratio** (`36/28` is `1.2857…`). CSS inherits a unitless line height as a ratio, so a child that changes font size without its own text style gets a different line height than it did with a px value.
   - Keep the ratio: a px `lineHeight` is not valid DTCG, even though Terrazzo accepts it.
