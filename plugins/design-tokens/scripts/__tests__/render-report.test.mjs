@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { renderReport, reportProblems } from "../render-report.mjs";
+import { renderReport, reportProblems, reportWarnings } from "../render-report.mjs";
 import { sampleReport } from "./sampleReport.mjs";
 
 describe("reportProblems", () => {
@@ -45,9 +45,45 @@ describe("reportProblems", () => {
     ]);
   });
 
+  it("refuses a group total that is not info, so its errors are not counted twice", () => {
+    const report = sampleReport();
+    const total = { ...sampleReport().findings[0], id: "tiers/role-aliases-palette@project#total", location: { file: "." }, title: "12 roles alias a role" };
+    report.findings.push(total);
+    assert.deepEqual(reportProblems(report), ["findings[2] is a group total (tiers/role-aliases-palette@project#total), so its severity is info, not error"]);
+    total.severity = "info";
+    assert.deepEqual(reportProblems(report), []);
+  });
+
+  it("keeps a whole-project finding at its own severity", () => {
+    const report = sampleReport();
+    report.findings.push({ ...sampleReport().findings[1], id: "docs/rules-document-exists@project#", ruleId: "docs/rules-document-exists", severity: "error", location: { file: "." } });
+    assert.deepEqual(reportProblems(report), []);
+  });
+
+  it("refuses a cited source that sources does not list", () => {
+    const report = sampleReport();
+    report.sources = report.sources.filter((source) => !source.url.endsWith("/faq/"));
+    assert.deepEqual(reportProblems(report), ["sources does not list https://www.designtokens.org/faq/, which a finding cites"]);
+  });
+
   it("refuses what is not a report at all", () => {
     assert.deepEqual(reportProblems(null), ["the report is not a JSON object"]);
     assert.ok(reportProblems({}).length > 5);
+  });
+});
+
+describe("reportWarnings", () => {
+  it("warns about a summary of more than one sentence, without refusing the report", () => {
+    const report = sampleReport();
+    report.parts[1].summary = "One role aliases another role. The palette also has aliases.";
+    assert.deepEqual(reportWarnings(report), ["parts.tiers.summary has more than one sentence; keep one, and move the detail into findings"]);
+    assert.deepEqual(reportProblems(report), []);
+  });
+
+  it("stays quiet for one sentence, even with inner punctuation", () => {
+    const report = sampleReport();
+    report.parts[0].summary = "Roles use purpose names in kebab-case (surface, on-surface), and ids map to classes.";
+    assert.deepEqual(reportWarnings(report), []);
   });
 });
 

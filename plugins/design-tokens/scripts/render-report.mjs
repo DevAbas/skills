@@ -62,6 +62,8 @@ export function reportProblems(report) {
       else if (seen.has(finding.id)) problems.push(`${at}.id ${finding.id} is not unique`);
       else seen.add(finding.id);
       if (!SEVERITIES.includes(finding.severity)) problems.push(`${at}.severity is ${JSON.stringify(finding.severity)}, expected one of ${SEVERITIES.join(", ")}`);
+      // A group's count repeats the per-file findings; any severity but info would count their errors twice.
+      if (isText(finding.id) && finding.id.endsWith("@project#total") && finding.severity !== "info") problems.push(`${at} is a group total (${finding.id}), so its severity is info, not ${finding.severity}`);
       for (const field of ["title", "why", "fix"]) if (!isText(finding[field])) problems.push(`${at}.${field} is missing`);
       if (typeof finding.location?.file !== "string") problems.push(`${at}.location.file is missing`);
     });
@@ -82,10 +84,29 @@ export function reportProblems(report) {
   }
 
   if (!Array.isArray(r.sources)) problems.push("sources is not a list");
-  else r.sources.forEach((source, index) => {
-    if (!isText(source?.title) || !isText(source?.url)) problems.push(`sources[${index}] needs a title and a url`);
-  });
+  else {
+    r.sources.forEach((source, index) => {
+      if (!isText(source?.title) || !isText(source?.url)) problems.push(`sources[${index}] needs a title and a url`);
+    });
+    // Every URL a finding cites is a document the audit relied on, so it is listed in sources.
+    const listed = new Set(r.sources.map((source) => source?.url));
+    const cited = new Set((Array.isArray(r.findings) ? r.findings : []).map((finding) => finding?.source).filter((source) => /^https?:\/\//.test(String(source))));
+    for (const url of cited) if (!listed.has(url)) problems.push(`sources does not list ${url}, which a finding cites`);
+  }
   return problems;
+}
+
+/**
+ * What a reader should know but that does not make the report incomplete: a part summary of more than one sentence,
+ * which makes the summary table hard to read (references/report.md). A warning, not a failure: a sentence count is
+ * a heuristic, and a threshold that refuses a report would be one chosen by eye.
+ * @param {Record<string, any>} report a report that passed `reportProblems`
+ * @returns {string[]}
+ */
+export function reportWarnings(report) {
+  return report.parts
+    .filter((part) => (part.summary.match(/[.!?]\s+(?=[A-Z`])/g) ?? []).length > 0)
+    .map((part) => `parts.${part.id}.summary has more than one sentence; keep one, and move the detail into findings`);
 }
 
 const SEVERITY_ORDER = Object.fromEntries(SEVERITIES.map((severity, index) => [severity, index]));
@@ -184,6 +205,7 @@ function main(argv) {
     console.error(`${path} is not a complete report:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
     return 1;
   }
+  for (const warning of reportWarnings(report)) console.error(`warning: ${warning}`);
   const markdown = renderReport(report);
   if (flags.includes("--stdout")) process.stdout.write(markdown);
   else {

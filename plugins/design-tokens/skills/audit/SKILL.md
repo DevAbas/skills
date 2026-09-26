@@ -9,7 +9,7 @@ description: >-
   project, and writes only its report.
 license: MIT
 compatibility: Claude Code, as part of the design-tokens plugin. Node.js 20 or later.
-allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs *) Read Grep Glob
+allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs *) Bash(date -u *) Read Grep Glob
 metadata:
   author: Abas Turabli
   author-title: AI-First Frontend Architect
@@ -72,7 +72,10 @@ If a subagent is not available, do the analysis here, with the auditor's instruc
    - `tool: { name: "design-tokens", version }`, where `version` comes from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`;
    - `project: { name, root: ".", commit }`, with the short commit from `git rev-parse --short HEAD` when the project is a git repository;
    - `date`, as today's ISO date.
-2. Write it to `design-tokens-audit/<YYYY-MM-DD>.json` in the project, adding `-2`, `-3` and so on if that name exists. Never overwrite or delete an earlier report.
+2. Write it to `design-tokens-audit/<stamp>.json` in the project.
+   - The stamp is the audit's UTC time from `date -u +%Y-%m-%dT%H%M%SZ`, for example `2026-09-26T143005Z`, so name order is time order (`${CLAUDE_PLUGIN_ROOT}/references/report.md`, Files).
+   - Never overwrite or delete an earlier report.
+   - Look for earlier reports with the Glob tool (`design-tokens-audit/*.json`), not with `ls`: on a first audit the folder does not exist, and a failing `ls` reads as an error.
 3. Render and validate:
 
    ```bash

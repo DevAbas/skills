@@ -31,7 +31,7 @@ A rule that nobody enforces is a rule that drifts (principles 8).
 
 ## Before starting
 
-1. **Read the gates.** From the newest report, read `design-tokens-audit/*.json` `gates`. With no report, run the scan (`node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs .`) and derive the gates from the rubric's Gate lines.
+1. **Read the gates.** From the newest report in `design-tokens-audit/` (`${CLAUDE_PLUGIN_ROOT}/references/report.md`, Files), read `gates`. With no report, run the scan (`node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs .`) and derive the gates from the rubric's Gate lines.
 2. **Read the references:**
    - `${CLAUDE_PLUGIN_ROOT}/references/principles.md` (8 and 9);
    - the profile the scan reports, for example `${CLAUDE_PLUGIN_ROOT}/references/profiles/terrazzo-tailwind-v4.md`.

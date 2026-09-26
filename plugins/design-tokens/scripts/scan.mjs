@@ -6,7 +6,7 @@
 //
 // It reports:
 // - the token files, resolvers and build configs;
-// - the rules document and its front matter keys;
+// - the rules document and its front matter keys, and other files that may be one;
 // - the styling and token packages, with their installed versions;
 // - where raw colours appear in source;
 // - which generated outputs and gates exist.
@@ -71,6 +71,18 @@ export function frontMatterKeys(markdown) {
     .filter(Boolean);
 }
 
+/**
+ * True for a Markdown or MDX file whose name suggests it may hold a design system's rules: DESIGN.md, a design
+ * system, design tokens or style guide document, a tokens page, or a docs/ file about design. A candidate only:
+ * the auditor reads it and decides (references/rubric.md, docs/rules-document-exists).
+ */
+export function isRulesDocumentCandidate(file) {
+  if (!/\.mdx?$/i.test(file)) return false;
+  const name = basename(file).toLowerCase();
+  if (name === "design.md" || /design[-_ ]?system|design[-_ ]?tokens|style[-_ ]?guide|^tokens\.mdx?$/.test(name)) return true;
+  return /(^|\/)docs\//.test(file) && name.includes("design");
+}
+
 /** The installed version of a package: from its own package.json in node_modules, which a range in the project's package.json is not. */
 function installedVersion(root, name) {
   try {
@@ -119,6 +131,7 @@ export function scanProject(root) {
 
   const designMd = files.find((file) => basename(file) === "DESIGN.md") ?? null;
   const rulesDocument = designMd ? { path: designMd, frontMatterKeys: frontMatterKeys(readText(root, designMd)) } : null;
+  const rulesDocumentCandidates = files.filter(isRulesDocumentCandidate).map((path) => ({ path, frontMatterKeys: frontMatterKeys(readText(root, path)) }));
 
   const cssFiles = files.filter((file) => /\.(css|scss|sass|less)$/.test(file));
   const themeBlocks = cssFiles.filter((file) => /@theme\b/.test(readText(root, file)));
@@ -152,6 +165,7 @@ export function scanProject(root) {
     profile: terrazzo && tailwindMajor === "4" ? "terrazzo-tailwind-v4" : null,
     tokens: { dtcgFiles: tokenFiles, resolvers, otherTokenJson, configs },
     rulesDocument,
+    rulesDocumentCandidates,
     styles: { cssFiles: cssFiles.length, tailwindThemeFiles: themeBlocks, generated },
     rawColors: { total: perFile.reduce((sum, entry) => sum + entry.count, 0), files: perFile.length, top: perFile.slice(0, 20) },
     gates,

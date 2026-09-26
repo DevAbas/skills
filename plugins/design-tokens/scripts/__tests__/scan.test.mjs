@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
-import { countRawColors, frontMatterKeys, listFiles, scanProject } from "../scan.mjs";
+import { countRawColors, frontMatterKeys, isRulesDocumentCandidate, listFiles, scanProject } from "../scan.mjs";
 import { writeProjectFixture } from "./projectFixture.mjs";
 
 describe("countRawColors", () => {
@@ -21,6 +21,16 @@ describe("frontMatterKeys", () => {
   it("is null without a closed front matter", () => {
     assert.equal(frontMatterKeys("# Title\n"), null);
     assert.equal(frontMatterKeys("---\nname: A\n"), null);
+  });
+});
+
+describe("isRulesDocumentCandidate", () => {
+  it("accepts names that suggest a design rules document", () => {
+    for (const file of ["DESIGN.md", "docs/design-system.md", "design-tokens.mdx", "src/StyleGuide.mdx", "stories/tokens.mdx", "docs/ui/design-principles.md"]) assert.ok(isRulesDocumentCandidate(file), file);
+  });
+
+  it("refuses other documents and files that are not Markdown", () => {
+    for (const file of ["README.md", "docs/getting-started.md", "design-system.ts", "notes/design.txt", "src/design-review.md"]) assert.ok(!isRulesDocumentCandidate(file), file);
   });
 });
 
@@ -50,6 +60,13 @@ describe("scanProject", () => {
     assert.deepEqual(scan.tokens.dtcgFiles, ["tokens/themes/light.tokens.json"]);
     assert.deepEqual(scan.tokens.resolvers, ["tokens/design.resolver.json"]);
     assert.deepEqual(scan.rulesDocument, { path: "DESIGN.md", frontMatterKeys: ["name", "imports", "colors", "components"] });
+  });
+
+  it("lists other files that may be the rules document, with their front matter keys", () => {
+    assert.deepEqual(scan.rulesDocumentCandidates, [
+      { path: "DESIGN.md", frontMatterKeys: ["name", "imports", "colors", "components"] },
+      { path: "docs/design-system.md", frontMatterKeys: ["title"] },
+    ]);
   });
 
   it("counts raw colours in source, skipping tests and generated outputs", () => {

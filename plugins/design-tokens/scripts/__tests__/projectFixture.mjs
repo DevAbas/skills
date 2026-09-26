@@ -20,6 +20,9 @@ const FILES = {
   "src/components/Card.test.tsx": 'it("reads #ffffff", () => {});\n',
   "src/styles/theme.generated.css": "@theme {\n  --color-surface: #ffffff;\n}\n",
   "src/styles/app.css": '@import "tailwindcss";\n@theme { --color-*: initial; }\n',
+  "docs/design-system.md": "---\ntitle: Design system\n---\n# Design system\n",
+  "docs/getting-started.md": "# Getting started\n",
+  "README.md": "# Fixture\n",
   ".claude/settings.json": "{}",
   ".github/workflows/ci.yml": "name: ci\n",
 };

@@ -21,7 +21,7 @@ claude plugin install design-tokens@fearchitect
 | Skill | What it does |
 |---|---|
 | `/design-tokens:setup` | Plans a token architecture for a new project, waits for approval, then builds it: resolver, palette from seeds, roles per theme, derived states, `DESIGN.md`, and the build |
-| `/design-tokens:audit` | Scans the project and checks it against the Token Architecture rubric: naming, tiers, format, docs. Writes `design-tokens-audit/<date>.json` and its Markdown. Changes nothing else |
+| `/design-tokens:audit` | Scans the project and checks it against the Token Architecture rubric: naming, tiers, format, docs. Writes `design-tokens-audit/<UTC stamp>.json`, for example `2026-09-26T143005Z.json`, and its Markdown. Changes nothing else |
 | `/design-tokens:fix` | Takes finding ids from a report, plans each fix, waits for approval, implements, then re-audits and compares the reports to show what closed |
 | `/design-tokens:harness` | Installs the gates a report recommends: token and rules checks, a staleness check, ESLint rules, Claude Code hooks, a git pre-commit hook and CI, all from one `design-tokens.gates.json`. Proves each gate by making it fail once |
 
@@ -36,7 +36,7 @@ Four parts, each `met`, `partial` or `missing`. Every finding names a rule id th
 | `naming` | Roles named by purpose, one case convention, one name from tokens to code |
 | `tiers` | Palette holds values, roles alias the palette or record a derived rule, text styles alias the fonts, code never reads the palette or states a literal, the component contract names roles |
 | `format` | Valid DTCG, every theme complete, outputs generated and checked for staleness, a machine-readable contract |
-| `docs` | The rules document holds no values, cites existing tokens, explains how to read them, stays current |
+| `docs` | A rules document exists; it holds no values, cites existing tokens, explains how to read them, and stays current |
 
 See `references/rubric.md`. The reasons behind each rule, with sources, are in `references/principles.md` and `references/decisions.md`.
 
@@ -63,8 +63,10 @@ The plugin's own scripts have no dependencies. The profile's checks use the proj
 
 ## Tests
 
+From `plugins/design-tokens`, with no path: from Node 21 on, a path given to `node --test` is read as a file or glob, not a folder to search.
+
 ```bash
-node --test plugins/design-tokens
+node --test
 ```
 
 ## About

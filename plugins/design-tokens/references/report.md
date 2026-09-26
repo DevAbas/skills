@@ -5,10 +5,14 @@
 ## Files
 
 The audit writes two files into the audited project:
-- `design-tokens-audit/<YYYY-MM-DD>.json`: the source. `fix`, `harness` and `compare-reports` read it.
-- `design-tokens-audit/<YYYY-MM-DD>.md`: rendered from the JSON by `scripts/render-report.mjs`. Never written by hand.
+- `design-tokens-audit/<stamp>.json`: the source. `fix`, `harness` and `compare-reports` read it.
+- `design-tokens-audit/<stamp>.md`: rendered from the JSON by `scripts/render-report.mjs`. Never written by hand.
 
-A second audit on the same day adds a suffix: `<YYYY-MM-DD>-2.json`. The audit never deletes an older report, because comparing two reports is how a fix is verified.
+**The stamp** is the UTC time of the audit, to the second, with no separators inside the time: `2026-09-26T143005Z`. It comes from `date -u +%Y-%m-%dT%H%M%SZ`. Name order is then time order, so the last name is the newest report. A date with a counter (`2026-09-26-2`) does not have that property: it sorts before `2026-09-26`.
+
+The audit never deletes an older report, because comparing two reports is how a fix is verified.
+
+**Reports from 0.1.0** are named by date only, with `-2`, `-3` for later audits that day. Their name order is wrong. Among them, the newest is the one with the highest counter on the latest date. When that is unclear, ask the user.
 
 ## Top-level fields
 
@@ -22,7 +26,7 @@ A second audit on the same day adds a suffix: `<YYYY-MM-DD>-2.json`. The audit n
 | `parts` | The four parts (`naming`, `tiers`, `format`, `docs`), each with `status` and a one-sentence `summary` |
 | `findings` | See below |
 | `gates` | See below |
-| `sources` | Every document the audit relied on: `title`, `url`, and `version` where it applies |
+| `sources` | Every document the audit relied on, `title`, `url`, and `version` where it applies. It includes every URL a finding cites in `source`: `render-report.mjs` refuses a report where a cited URL is missing |
 
 ## A finding
 
@@ -44,11 +48,14 @@ A second audit on the same day adds a suffix: `<YYYY-MM-DD>-2.json`. The audit n
 **The finding `id`** is `<ruleId>@<file>#<pointer>`:
 - `pointer` is a token id, a front matter path, or a code symbol;
 - for a finding about a whole file, use `#` alone;
-- for a finding about the whole project, use `@project#`.
+- for a finding about the whole project, use `@project#`, with the finding's real severity;
+- for the count that closes a group (below), use `@project#total`, always with severity `info`.
 
 The id must not contain a line number: a line moves when unrelated code changes, and the id must stay the same from one audit to the next. The line goes in `evidence`.
 
-**Grouping:** one finding per rule and place. A rule broken in forty files is one finding per file, capped at the ten files with the most matches. A further finding, `<ruleId>@project#`, gives the total count.
+**Grouping:** one finding per rule and place. A rule broken in forty files is one finding per file, capped at the ten files with the most matches. When the cap drops files, a further finding, `<ruleId>@project#total` with severity `info`, gives the total count and lists the dropped files as evidence. It is `info` because its errors are already counted in the per-file findings: counting them again would inflate the result. `render-report.mjs` refuses a `#total` finding with any other severity.
+
+**One value in two documents:** a value the rules document and the code both state is one `docs/rules-hold-no-values` finding at the document location, with each code location as evidence. It is not one finding per code file under `format/single-source-build`, which is about generated outputs.
 
 ## A gate
 
@@ -83,7 +90,7 @@ Every rule in the rubric whose Gate is machine-checkable appears in some gate's 
 
 ## Statuses of parts
 
-Use `rubric.md`, Parts and statuses. The `summary` is one sentence and states the most important finding or, when the part is met, what holds it.
+Use `rubric.md`, Parts and statuses. The `summary` is one sentence and states the most important finding or, when the part is met, what holds it. The detail belongs in the findings. The summary is a table cell, and more than one sentence makes the table unreadable, so `render-report.mjs` warns about it.
 
 ## The Markdown
 

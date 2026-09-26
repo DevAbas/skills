@@ -49,6 +49,9 @@ export function sampleReport() {
         status: "missing",
       },
     ],
-    sources: [{ title: "DTCG Format", url: "https://www.designtokens.org/tr/2025.10/format/", version: "2025.10" }],
+    sources: [
+      { title: "DTCG Format", url: "https://www.designtokens.org/tr/2025.10/format/", version: "2025.10" },
+      { title: "DTCG FAQ", url: "https://www.designtokens.org/faq/" },
+    ],
   };
 }

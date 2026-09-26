@@ -24,7 +24,7 @@ This skill closes findings from an audit report. The order is fixed: plan, appro
 
 ## Before starting
 
-1. **Find the report.** Use the one the user names, or the newest `design-tokens-audit/*.json`. If there is none, stop and suggest `/design-tokens:audit`.
+1. **Find the report.** Use the one the user names. Otherwise use the newest `design-tokens-audit/*.json`: the last by name for stamped reports, and by the rule for 0.1.0 names (`${CLAUDE_PLUGIN_ROOT}/references/report.md`, Files). If there is none, stop and suggest `/design-tokens:audit`.
 2. **Read the references:**
    - `${CLAUDE_PLUGIN_ROOT}/references/report.md`;
    - `${CLAUDE_PLUGIN_ROOT}/references/principles.md`;
@@ -54,6 +54,10 @@ For each finding, write:
 Before planning code that uses a tool's API, confirm the API in the documentation for the installed version (`${CLAUDE_PLUGIN_ROOT}/references/sources.md`). If the documentation disagrees with the report or this plugin, stop and report the difference.
 
 Present the plan and wait for approval. Use plan mode when the session offers it.
+
+**The rules document.** For `docs/rules-document-exists`, or when a rules document is rewritten:
+- **No rules document:** start from `${CLAUDE_PLUGIN_ROOT}/assets/setup/DESIGN.md`, keep its sections and fill them from the project's tokens and components.
+- **Another rules document:** keep it, and bring it to the rules (decisions, The rules document: no values, a machine-readable contract, only existing token ids). Do not add a second document beside it.
 
 ## Step 3: Implement
 

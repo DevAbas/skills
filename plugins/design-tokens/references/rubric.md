@@ -17,7 +17,7 @@ The rubric has four parts. Each gets one status in the report:
 |---|---|
 | `met` | The part's foundation exists and no `error` or `warning` finding remains in it |
 | `partial` | The foundation exists, but the part has `error` or `warning` findings |
-| `missing` | The foundation is absent: no token files (for `naming`, `tiers`, `format`), or no rules document (for `docs`) |
+| `missing` | The foundation is absent: no token files (for `naming`, `tiers`, `format`), or no rules document (for `docs`, exactly when the report has a `docs/rules-document-exists` finding) |
 
 There is no numeric score: a weighted number would be a threshold chosen by eye. The statuses and the findings are the result.
 
@@ -180,8 +180,9 @@ Each rule block has five fields:
 - **Why:** principles 1 and 7.
 - **Check (core):**
   - find where the code's CSS variables and theme are defined;
-  - flag hand-written values that duplicate tokens;
+  - flag hand-written values that duplicate what the build generates from the tokens;
   - check whether a staleness check and an edit guard exist.
+- **Scope:** this rule covers the token build's outputs against the tokens. A value written both in the rules document and in code is not this rule: it is one `docs/rules-hold-no-values` finding at the document location, with each code location as evidence.
 - **Gate:** `--check` build comparison, a pre-commit, and an agent hook denying edits to outputs.
 - **Default:** `error` for a duplicated source, `warning` for a missing check.
 
@@ -197,11 +198,19 @@ Each rule block has five fields:
 
 ## docs
 
+### `docs/rules-document-exists`
+
+- **What:** the project has one rules document that explains the tokens: what each role means, when it is used, and which roles each component reads. `DESIGN.md` is the recommended form. Another document qualifies when it does that job (decisions, The rules document).
+- **Why:** principles 1 and 11. Without it, no rule has a home and no agent can tell a role's use from its value.
+- **Check (core):** read the scan's `rulesDocument` and every entry of `rulesDocumentCandidates` before deciding. A README section or a Storybook page that lists tokens without their rules does not qualify.
+- **Gate:** review.
+- **Default:** `error`. When this finding exists, the `docs` part is `missing`, and the other `docs` rules are not reported.
+
 ### `docs/rules-hold-no-values`
 
 - **What:** the rules document states no token value (hex, px, rem, font sizes, durations) in its front matter or its prose. It cites token ids.
 - **Why:** principles 1.
-- **Check (core):** search the rules document for values. Ignore code blocks that document syntax.
+- **Check (core):** search the rules document for values. Ignore code blocks that document syntax. A value that the document and the code both state is one finding here, at the document location, with each code location as evidence.
 - **Gate:** rules-contract check (front matter). Prose is a review item.
 - **Default:** `error` in the front matter, `warning` in the prose.
 
