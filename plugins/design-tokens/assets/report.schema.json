@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/DevAbas/skills/plugins/design-tokens/assets/report.schema.json",
+  "title": "design-tokens audit report",
+  "description": "The report /design-tokens:audit writes. references/report.md explains each field.",
+  "type": "object",
+  "required": ["schemaVersion", "tool", "project", "date", "stack", "parts", "findings", "gates", "sources"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "design-tokens" },
+        "version": { "type": "string" }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["name", "root"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "root": { "type": "string" },
+        "commit": { "type": ["string", "null"] }
+      }
+    },
+    "date": { "type": "string", "format": "date" },
+    "stack": {
+      "type": "object",
+      "required": ["profile"],
+      "properties": {
+        "profile": { "enum": ["terrazzo-tailwind-v4", null] },
+        "tokenFormat": { "type": ["string", "null"] },
+        "styling": { "type": "array", "items": { "type": "string" } },
+        "rulesDocument": { "type": ["string", "null"] },
+        "versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["installed"],
+            "properties": {
+              "installed": { "type": ["string", "null"] },
+              "latest": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "summary"],
+        "properties": {
+          "id": { "enum": ["naming", "tiers", "format", "docs"] },
+          "status": { "enum": ["met", "partial", "missing"] },
+          "summary": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "ruleId", "part", "severity", "title", "location", "why", "fix"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z]+/[a-z0-9-]+@[^\\s]*#[^\\s]*$" },
+          "ruleId": { "type": "string", "pattern": "^(naming|tiers|format|docs)/[a-z0-9-]+$" },
+          "part": { "enum": ["naming", "tiers", "format", "docs"] },
+          "severity": { "enum": ["error", "warning", "info"] },
+          "title": { "type": "string", "minLength": 1 },
+          "location": {
+            "type": "object",
+            "required": ["file"],
+            "properties": {
+              "file": { "type": "string" },
+              "pointer": { "type": "string" }
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["file"],
+              "properties": {
+                "file": { "type": "string" },
+                "line": { "type": "integer", "minimum": 1 },
+                "excerpt": { "type": "string" }
+              }
+            }
+          },
+          "why": { "type": "string", "minLength": 1 },
+          "source": { "type": "string" },
+          "fix": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "does", "checks", "tool", "runs", "status"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^gate/[a-z0-9-]+$" },
+          "does": { "type": "string", "minLength": 1 },
+          "checks": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "closes": { "type": "array", "items": { "type": "string" } },
+          "tool": {
+            "type": "object",
+            "required": ["name", "kind"],
+            "properties": {
+              "name": { "type": "string" },
+              "kind": { "enum": ["existing", "custom"] },
+              "basis": { "type": "string" }
+            }
+          },
+          "runs": { "type": "array", "minItems": 1, "items": { "enum": ["agent-edit", "agent-commit", "commit", "ci"] } },
+          "status": { "enum": ["present", "partial", "missing"] }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "url"],
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": "string" },
+          "version": { "type": "string" }
+        }
+      }
+    }
+  }
+}

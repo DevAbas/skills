@@ -1,0 +1,114 @@
+---
+name: audit
+description: >-
+  Audit a web project's design-token architecture and write a structured report. Covers four parts:
+  naming, tiers (palette, roles, component contract), a tool-readable format (W3C DTCG, generated
+  outputs), and a rules document that stays current and holds no values. Use when the user asks to
+  "audit the design tokens", "check the design system", "review the token architecture", "is our
+  design system AI-ready", or before fixing or gating a token system. Read-only: it never edits the
+  project, and writes only its report.
+license: MIT
+compatibility: Claude Code, as part of the design-tokens plugin. Node.js 20 or later.
+allowed-tools: Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs *) Bash(node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs *) Read Grep Glob
+metadata:
+  author: Abas Turabli
+  author-title: AI-First Frontend Architect
+  website: https://abasturabli.com
+  linkedin: https://www.linkedin.com/in/turabli/
+---
+
+# design-tokens:audit, Token Architecture Audit
+
+> By [Abas Turabli](https://abasturabli.com), AI-First Frontend Architect
+
+This skill audits the current project against the Token Architecture rubric. It writes a JSON report and its Markdown rendering, and gives a short summary in chat. It changes nothing in the project except the new report files.
+
+## Before starting
+
+1. The project root is the current working directory, unless the user named another folder.
+2. Read `${CLAUDE_PLUGIN_ROOT}/references/report.md` for the report's shape and file names.
+3. Keep `${CLAUDE_PLUGIN_ROOT}/references/rubric.md` at hand; the auditor reads it in full.
+
+## Step 1: Scan
+
+Run the inventory. It is read-only and prints JSON:
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs .
+```
+
+It lists:
+- token files, resolvers and build configs;
+- the rules document and its front matter keys;
+- token and styling packages with their installed versions;
+- raw colours per source file;
+- generated outputs and existing gates;
+- the profile (`terrazzo-tailwind-v4` or `null`).
+
+If the scan fails, read the project directly and say so in the report. Do not block on the script.
+
+## Step 2: Run the project's existing checks
+
+If the project already has token checks, run them and keep their output as evidence. These can be package scripts that check tokens, rules or generated outputs, or `npx tz check` when Terrazzo is installed.
+
+- **Read-only only.** Run a check only if it reads and reports. A build that writes files is not a check. Ask before running anything that writes.
+- **Ask about new commands.** Running a command the user has not run before needs their approval.
+
+## Step 3: Delegate the analysis
+
+Start the read-only auditor, `design-tokens:token-auditor`, with a prompt that contains:
+- the project root;
+- the scan's JSON;
+- the output of step 2, if any.
+
+The auditor reads the rubric, checks every rule, and returns one JSON object: `stack`, `parts`, `findings`, `gates` and `sources`. Its context is its own, so a large project does not fill this conversation.
+
+If a subagent is not available, do the analysis here, with the auditor's instructions (`${CLAUDE_PLUGIN_ROOT}/agents/token-auditor.md`).
+
+## Step 4: Write the report
+
+1. Complete the auditor's object into a report:
+   - `schemaVersion: "1"`;
+   - `tool: { name: "design-tokens", version }`, where `version` comes from `${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json`;
+   - `project: { name, root: ".", commit }`, with the short commit from `git rev-parse --short HEAD` when the project is a git repository;
+   - `date`, as today's ISO date.
+2. Write it to `design-tokens-audit/<YYYY-MM-DD>.json` in the project, adding `-2`, `-3` and so on if that name exists. Never overwrite or delete an earlier report.
+3. Render and validate:
+
+   ```bash
+   node ${CLAUDE_PLUGIN_ROOT}/scripts/render-report.mjs design-tokens-audit/<file>.json
+   ```
+
+   It refuses an incomplete report and lists what is missing. Fix the JSON and run it again. Never write the Markdown by hand.
+
+## Step 5: Summarise in chat
+
+Print these, and nothing more:
+- the four part statuses;
+- the error, warning and info counts;
+- the three most important findings;
+- the gates with status `missing`;
+- the paths of the two report files.
+
+Then offer the next steps:
+- `/design-tokens:fix`, with the finding ids the user picks, which plans before changing anything;
+- `/design-tokens:harness`, to install the recommended gates.
+
+## Rules
+
+- **Read-only.** The only files this skill writes are the report files.
+- **Evidence you read.** Every finding cites a file and line the auditor read. A rule that cannot be confirmed is stated as unconfirmed, not reported as broken.
+- **Rubric only.** Findings are the rubric's rules and nothing else.
+- **The report stays.** Suggest adding `design-tokens-audit/` to version control, so a fix can be compared with the audit that asked for it.
+
+## Tone
+
+Write for senior engineers. State the finding, cite the source, give the fix. No filler, no marketing language.
+
+## About
+
+Built by Abas Turabli. The rubric comes from building a DTCG token architecture with its rules, gates and generated outputs end to end.
+
+- Website: https://abasturabli.com
+- LinkedIn: https://www.linkedin.com/in/turabli/
+- License: MIT

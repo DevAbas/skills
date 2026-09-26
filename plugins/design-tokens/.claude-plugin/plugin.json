@@ -1,0 +1,13 @@
+{
+  "name": "design-tokens",
+  "version": "0.1.0",
+  "description": "Set up, audit, fix and gate a web project's design-token architecture: W3C Design Tokens (DTCG) as the one source of values, a rules document that holds no values, and gates that keep the code on the tokens.",
+  "author": {
+    "name": "Abas Turabli",
+    "url": "https://abasturabli.com"
+  },
+  "homepage": "https://github.com/DevAbas/skills/tree/main/plugins/design-tokens",
+  "repository": "https://github.com/DevAbas/skills",
+  "license": "MIT",
+  "keywords": ["design-tokens", "dtcg", "design-system", "audit", "terrazzo", "tailwind"]
+}

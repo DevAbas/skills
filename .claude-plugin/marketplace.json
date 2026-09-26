@@ -1,0 +1,15 @@
+{
+  "name": "fearchitect",
+  "description": "Claude Code plugins by Abas Turabli",
+  "owner": {
+    "name": "Abas Turabli",
+    "url": "https://abasturabli.com"
+  },
+  "plugins": [
+    {
+      "name": "design-tokens",
+      "source": "./plugins/design-tokens",
+      "description": "Set up, audit, fix and gate a web project's design-token architecture"
+    }
+  ]
+}
