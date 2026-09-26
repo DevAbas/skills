@@ -3,7 +3,7 @@ name: harness
 description: >-
   Write and install the gates that keep a web project on its design tokens: token and rules checks,
   a staleness check for generated outputs, code lint rules, Claude Code hooks, a git pre-commit hook
-  and a CI job, all driven by one design-tokens.gates.json. Existing tools first; custom checks only
+  and a CI job, all driven by one design-system/gates.json. Existing tools first; custom checks only
   where no tool has the rule. Use when the user asks to "add design-token gates", "enforce the
   tokens", "set up the token lint", "install the hooks", or after /design-tokens:audit reports
   missing gates.
@@ -38,7 +38,7 @@ A rule that nobody enforces is a rule that drifts (principles 8).
 
 ## Before starting
 
-1. **Read the gates.** From the newest report in `design-tokens-audit/` (`${CLAUDE_PLUGIN_ROOT}/references/report.md`, Files), read `gates`. With no report, run the scan (`node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs .`) and derive the gates from the rubric's Gate lines.
+1. **Read the gates.** From the newest report in `design-system/audits/` (or `design-tokens-audit/` from before 0.4.0) (`${CLAUDE_PLUGIN_ROOT}/references/report.md`, Files), read `gates`. With no report, run the scan (`node ${CLAUDE_PLUGIN_ROOT}/scripts/scan.mjs .`) and derive the gates from the rubric's Gate lines.
 2. **Read the references:**
    - `${CLAUDE_PLUGIN_ROOT}/references/principles.md` (8 and 9);
    - the profile the scan reports, for example `${CLAUDE_PLUGIN_ROOT}/references/profiles/terrazzo-tailwind-v4.md`.
@@ -71,19 +71,19 @@ Before configuring a tool, confirm its options in the documentation for the inst
 
 ## Step 2: One config
 
-Write `design-tokens.gates.json` at the project root, starting from `${CLAUDE_PLUGIN_ROOT}/assets/harness/core/design-tokens.gates.json`. It is the one place the gates read from:
+Write `design-system/gates.json`, starting from `${CLAUDE_PLUGIN_ROOT}/assets/harness/core/design-tokens.gates.json`. A project with a 0.3.x `design-tokens.gates.json` at the root moves it there. It is the one place the gates read from:
 - `generated`: globs of the outputs an agent may never edit;
 - `sources`: globs of the files whose edit runs `onSourceEdit` (tokens, rules document, build template and config);
 - `onSourceEdit`: commands run after such an edit;
 - `lint`: `files` and `command`, for the linter an edited file gets, and `strictEnv`, the variables that make its rules errors;
 - `beforeCommit`: the commands every commit and CI run;
-- `tokens` (profile checks): `resolver`, `modifier`, `palette`, `roles`, `typography`, `fonts`, `extensionKey`, `outDir`, `rulesDocument` and `readable`. `files` lists plain token files for a project without a resolver. Defaults are in `${CLAUDE_PLUGIN_ROOT}/scripts/lib/project-modules.mjs`.
+- `tokens` (the checks): `resolver`, `modifier`, `palette`, `roles`, `typography`, `fonts`, `extensionKey`, `outDir`, `rulesDocument` and `readable`. Write every one that differs from the canonical layout, for example the `stack.tokenSettings` the audit recorded. A check that finds an empty roles group fails and names the groups the tokens have. `files` lists plain token files for a project without a resolver. Defaults are in `${CLAUDE_PLUGIN_ROOT}/scripts/lib/project-modules.mjs`.
 
 Every path and command in it is the project's own. None is copied from the example.
 
 ## Step 3: Checks
 
-**Token and rules checks (any stack, no dependencies).** Copy them from the plugin into a folder the project chooses, for example `scripts/design-tokens/`, keeping their layout so the relative imports hold:
+**Token and rules checks (any stack, no dependencies).** Copy them from the plugin into `design-system/checks/` (`${CLAUDE_PLUGIN_ROOT}/references/conventions.md`), keeping their layout so the relative imports hold:
 
 | File | Rules |
 |---|---|
@@ -101,7 +101,7 @@ Every path and command in it is the project's own. None is copied from the examp
 
 **When you adapt a copied file:**
 - **Read the file first**, and keep its comments, which say what each rule does and why.
-- **Change only what the project needs:** names, paths, the class helpers the code uses, the utilities it has. Settings belong in `design-tokens.gates.json`, not in the copied code.
+- **Change only what the project needs:** names, paths, the class helpers the code uses, the utilities it has. Settings belong in `design-system/gates.json`, not in the copied code.
 - **Test what you change.** Write a unit test for each pure function you change, in the project's test framework, with a negative case: the input the rule must reject.
 - **Ask before dependencies.** Only `check-rules-contract.mjs` (`yaml`) and the profile's build and lint (Terrazzo, ESLint) need packages. Ask before adding any.
 

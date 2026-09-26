@@ -7,6 +7,34 @@ A version bump means:
 - **Minor:** a new rule, gate, profile or skill.
 - **Patch:** a fix or a clarification.
 
+## 0.4.0
+
+A canonical layout, and the lessons from the first migration of a real project.
+
+- **Canonical layout.**
+  - `DESIGN.md` at the root. Under `design-system/`: `tokens/` (foundation, semantic, themes, one resolver), `checks/`, `audits/` and `gates.json`.
+  - Group names are singular: `palette`, `font`, `color`, `typography`, `spacing`, `rounded` and `shadow`.
+  - `setup` creates the layout, with a resolver for one context (sets only) or for several (a `theme` modifier). The checks default to it.
+  - A project with other names or paths states them in `design-system/gates.json`, and that is not a finding (`references/conventions.md`).
+- **No silent passes.** `check-tokens` fails when the roles group holds no token, and names the groups the tokens do have. It reports a missing palette, and ends with what it checked. New flags `--resolver`, `--roles`, `--palette`, `--typography`, `--fonts` and `--modifier`. The audit passes them, and records them in `stack.tokenSettings`.
+- **Report traceability.**
+  - `previousIds` marks a finding that moved to a new location, and `compare-reports` lists it as moved.
+  - `project.dirty` says that the audit read uncommitted changes.
+  - Both are optional, so the schema stays 1.
+- **`fix`.**
+  - The visual check is confirmed to test this project, and covers interactive states.
+  - A visual problem is measured before it is explained.
+  - A change of approach cites its standard.
+- **Profile Pitfalls, with sources.**
+  - How a line height ratio lays out (DTCG §9.8, CSS 2.1 §10.8.1, MDN, Tailwind's defaults, Blink's float32 and 1/64 px truncation), and the rule to store the smallest 4-decimal ratio that does not fall below the pixel value.
+  - Tailwind ignores `--text-*--font-family`.
+  - Optical centring is not a token fix.
+- **Scan.**
+  - Agent configuration folders and `public/` are not rules-document candidates.
+  - Husky's internal `.husky/_/` scripts are not gates.
+  - `design-system/audits/` is skipped.
+- **Migrating from 0.3.x.** Move `design-tokens.gates.json` to `design-system/gates.json`. It is still read, with a note. Reports in `design-tokens-audit/` are still read.
+
 ## 0.3.0
 
 The checks no longer depend on the build tool.

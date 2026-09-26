@@ -11,7 +11,7 @@
 //
 // Terrazzo's header names the template relative to the output folder, which
 // differs for the temporary build, so that line is ignored. The output folder
-// comes from design-tokens.gates.json (`tokens.outDir`, lib/project-modules.mjs).
+// comes from design-system/gates.json (`tokens.outDir`, lib/project-modules.mjs).
 
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";

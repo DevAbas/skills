@@ -1,5 +1,5 @@
 # The design-token gates in CI: the same `beforeCommit` commands a person's
-# and an agent's commit run (design-tokens.gates.json). Copy to
+# and an agent's commit run (design-system/gates.json). Copy to
 # .github/workflows/design-tokens.yml, then set the Node version and the
 # install command to the project's own.
 name: design-tokens

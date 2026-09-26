@@ -1,18 +1,25 @@
-// What the checks share: the token settings from the project's
-// design-tokens.gates.json (`tokens`), and loading a package from the
-// project's own node_modules, so a check runs with the versions the project
-// installed wherever the check file lives. Only the rules document's check
-// needs one (`yaml`); the token checks need none. No dependencies, Node 20 or later.
+// What the checks share: the token settings of a project, and loading a
+// package from the project's own node_modules, so a check runs with the
+// versions the project installed wherever the check file lives. Only the rules
+// document's check needs one (`yaml`); the token checks need none. No
+// dependencies, Node 20 or later.
+//
+// The defaults are the canonical layout (references/conventions.md). A project
+// that differs states its own paths and group names in design-system/gates.json
+// (`tokens`), and a check's command-line flags override both.
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
-/** The token settings every check reads, with the defaults a project overrides in design-tokens.gates.json. */
+/** The config file, relative to the root; the second is where 0.3.x kept it, still read. */
+export const CONFIG_FILES = ["design-system/gates.json", "design-tokens.gates.json"];
+
+/** The token settings every check reads: the canonical layout, overridden by the config's `tokens` object and by flags. */
 export const TOKEN_DEFAULTS = {
   /** The DTCG resolver, relative to the root. */
-  resolver: "tokens/design.resolver.json",
+  resolver: "design-system/tokens/design.resolver.json",
   /** Plain token files, merged in this order, for a project without a resolver. */
   files: [],
   /** The resolver modifier whose contexts are the themes. */
@@ -34,15 +41,40 @@ export const TOKEN_DEFAULTS = {
   readable: ["color", "typography", "rounded"],
 };
 
-/** The project's token settings: TOKEN_DEFAULTS, overridden by the `tokens` object of design-tokens.gates.json. */
-export function tokenSettings(root = process.cwd()) {
-  let overrides = {};
-  try {
-    overrides = JSON.parse(readFileSync(join(root, "design-tokens.gates.json"), "utf8")).tokens ?? {};
-  } catch {
-    overrides = {};
+/** The command-line flags a check accepts, each overriding one setting. */
+export const SETTING_FLAGS = { "--resolver": "resolver", "--roles": "roles", "--palette": "palette", "--typography": "typography", "--fonts": "fonts", "--modifier": "modifier" };
+
+/** The settings named by flags in `argv` (`--roles colors`). */
+export function flagSettings(argv = []) {
+  const settings = {};
+  for (let i = 0; i < argv.length; i++) {
+    const key = SETTING_FLAGS[argv[i]];
+    if (key && argv[i + 1] !== undefined) settings[key] = argv[++i];
   }
-  return { ...TOKEN_DEFAULTS, ...overrides };
+  return settings;
+}
+
+/**
+ * The project's config file and its content. `notes` says when the config is in the 0.3.x place, or unreadable.
+ * @returns {{ path: string | null, config: Record<string, any>, notes: string[] }}
+ */
+export function readConfig(root = process.cwd()) {
+  for (const [index, file] of CONFIG_FILES.entries()) {
+    const path = join(root, file);
+    if (!existsSync(path)) continue;
+    const notes = index > 0 ? [`${file} is where 0.3.x kept the config; move it to ${CONFIG_FILES[0]}`] : [];
+    try {
+      return { path: file, config: JSON.parse(readFileSync(path, "utf8")), notes };
+    } catch (error) {
+      return { path: file, config: {}, notes: [...notes, `${file} is not valid JSON: ${error.message}`] };
+    }
+  }
+  return { path: null, config: {}, notes: [] };
+}
+
+/** The project's token settings: TOKEN_DEFAULTS, then the config's `tokens`, then `flags`. */
+export function tokenSettings(root = process.cwd(), flags = {}) {
+  return { ...TOKEN_DEFAULTS, ...(readConfig(root).config.tokens ?? {}), ...flags };
 }
 
 /** Imports a package the way the project at `root` resolves it; throws with the install hint when it is missing. */

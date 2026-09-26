@@ -4,7 +4,7 @@
 version: alpha
 name: <Product name>
 description: <One sentence on the product's visual character. The rules and their reasons; the values are the design tokens it imports.>
-imports: ./tokens/design.resolver.json
+imports: ./design-system/tokens/design.resolver.json
 components: {}
 ---
 

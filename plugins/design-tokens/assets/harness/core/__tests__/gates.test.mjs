@@ -52,7 +52,7 @@ describe("gatesProblems", () => {
       "lint needs files (globs) and command (the linter, which receives the edited file as its last argument)",
       "sources is set but onSourceEdit runs nothing",
     ]);
-    assert.deepEqual(gatesProblems(null), ["design-tokens.gates.json is not a JSON object"]);
+    assert.deepEqual(gatesProblems(null), ["design-system/gates.json is not a JSON object"]);
   });
 });
 

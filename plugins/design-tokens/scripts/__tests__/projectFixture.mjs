@@ -24,6 +24,11 @@ const FILES = {
   "docs/getting-started.md": "# Getting started\n",
   "README.md": "# Fixture\n",
   ".claude/settings.json": "{}",
+  ".agents/skills/x/references/design-system.md": "# not this project's rules\n",
+  "public/topics/design-tokens.md": "# an article\n",
+  ".husky/_/pre-commit": "husky internal\n",
+  ".husky/pre-commit": "npm test\n",
+  "design-system/audits/2026-09-26T100000Z.json": '{"color": "#abcdef"}',
   ".github/workflows/ci.yml": "name: ci\n",
 };
 

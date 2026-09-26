@@ -30,7 +30,7 @@ describe("isRulesDocumentCandidate", () => {
   });
 
   it("refuses other documents and files that are not Markdown", () => {
-    for (const file of ["README.md", "docs/getting-started.md", "design-system.ts", "notes/design.txt", "src/design-review.md"]) assert.ok(!isRulesDocumentCandidate(file), file);
+    for (const file of ["README.md", "docs/getting-started.md", "design-system.ts", "notes/design.txt", "src/design-review.md", ".agents/skills/x/design-system.md", "public/topics/design-tokens.md"]) assert.ok(!isRulesDocumentCandidate(file), file);
   });
 });
 
@@ -73,6 +73,12 @@ describe("scanProject", () => {
     assert.deepEqual(scan.rawColors, { total: 3, files: 1, top: [{ file: "src/components/Card.tsx", count: 3 }] });
     assert.deepEqual(scan.styles.generated, ["src/styles/theme.generated.css"]);
     assert.equal(scan.styles.tailwindThemeFiles.length, 2);
+  });
+
+  it("keeps agent configuration, static content and earlier audits out", () => {
+    assert.ok(!scan.rulesDocumentCandidates.some((candidate) => candidate.path.startsWith(".agents/") || candidate.path.startsWith("public/")));
+    assert.deepEqual(scan.gates.gitHooks, [".husky/pre-commit"]);
+    assert.ok(!listFiles(fixture.root).some((file) => file.startsWith("design-system/audits/")));
   });
 
   it("finds the existing gates", () => {

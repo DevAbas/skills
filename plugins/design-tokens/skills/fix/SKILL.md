@@ -4,7 +4,7 @@ description: >-
   Fix the findings of a design-tokens audit report, one approved finding at a time: plan each change,
   wait for approval, implement it, then re-audit and compare the reports to show what closed. Use when
   the user asks to "fix the audit findings", "fix the token architecture", "move the colours into
-  tokens", or passes finding ids from design-tokens-audit/*.json. Needs an audit report; run
+  tokens", or passes finding ids from design-system/audits/*.json. Needs an audit report; run
   /design-tokens:audit first when there is none.
 license: MIT
 compatibility: Claude Code, as part of the design-tokens plugin. Node.js 20 or later.
@@ -31,7 +31,7 @@ This skill closes findings from an audit report. The order is fixed: plan, appro
 
 ## Before starting
 
-1. **Find the report.** Use the one the user names. Otherwise use the newest `design-tokens-audit/*.json`: the last by name for stamped reports, and by the rule for 0.1.0 names (`${CLAUDE_PLUGIN_ROOT}/references/report.md`, Files). If there is none, stop and suggest `/design-tokens:audit`.
+1. **Find the report.** Use the one the user names. Otherwise use the newest report in `design-system/audits/` (or `design-tokens-audit/` from before 0.4.0): the last by name for stamped reports, and by the rule for 0.1.0 names (`${CLAUDE_PLUGIN_ROOT}/references/report.md`, Files). If there is none, stop and suggest `/design-tokens:audit`.
 2. **Read the references:**
    - `${CLAUDE_PLUGIN_ROOT}/references/report.md`;
    - `${CLAUDE_PLUGIN_ROOT}/references/principles.md`;
@@ -68,9 +68,15 @@ Present the plan and wait for approval. Use plan mode when the session offers it
 
 **Batches that must not change rendering.** A migration, a rename or a move of values should leave every page looking the same. The plan says how that is proven:
 - **Baseline and compare.** Take a baseline with the project's own visual check (its screenshot or visual-regression script) before any change, and compare after it.
+- **Confirm the target.** Before the baseline, confirm the check tests this project: the port it loads answers with this app (its page title or a known element), not another server on the same port.
+- **Interactive states.** Cover the states a change can reach, not only each route's first paint: an open dialog or menu, hover, focus, a filled form.
 - **Output location.** Read where that tool writes its output from its config, its script or its documentation. Never search the disk for it.
 - **No visual check.** If the project has none, say so and ask how to verify. Do not install one unasked.
 - **Any difference** stops the batch and is reported with the pages and elements it touches.
+
+**Measure first.** When something looks wrong, measure it before explaining it: element rects, text ranges (`Range.getBoundingClientRect`), computed styles, in the committed code and in the change. A fix that changes an approach cites the standard it rests on (the spec, MDN, the tool's documentation for the installed version), not a hypothesis.
+
+**Names and paths.** A batch that moves a project to the canonical layout or names (`${CLAUDE_PLUGIN_ROOT}/references/conventions.md`) renames token ids, the rules document's contract and the code that reads them. Propose it as its own batch; never fold it into another.
 
 ## Step 3: Implement
 

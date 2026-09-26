@@ -2,7 +2,7 @@
 // hand. The edit is denied with the reason, through the JSON decision the
 // hooks reference documents for PreToolUse
 // (https://code.claude.com/docs/en/hooks). The generated files are the
-// `generated` globs of design-tokens.gates.json.
+// `generated` globs of design-system/gates.json.
 
 import { editedFile, hookInput, matchesAny, readGates } from "./gates.mjs";
 

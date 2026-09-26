@@ -1,16 +1,16 @@
 {
   "$schema": "https://www.designtokens.org/schemas/2025.10/resolver.json",
   "name": "<Product name>",
-  "description": "<One sentence: the product and its tiers. Palette, roles and components; code reads the roles, never the palette.>",
+  "description": "<One sentence: the product and its tiers.> Two or more contexts: the theme modifier selects the colour roles and shadows of each.",
   "version": "2025.10",
   "sets": {
     "foundation": {
       "description": "The palette and raw values: the same in every context.",
-      "sources": [{ "$ref": "foundation/colors.tokens.json" }, { "$ref": "foundation/typography.tokens.json" }]
+      "sources": [{ "$ref": "foundation/palette.tokens.json" }, { "$ref": "foundation/font.tokens.json" }]
     },
     "semantic": {
       "description": "Roles and styles that are the same in every context.",
-      "sources": [{ "$ref": "semantic/typography.tokens.json" }]
+      "sources": [{ "$ref": "semantic/typography.tokens.json" }, { "$ref": "semantic/spacing.tokens.json" }, { "$ref": "semantic/rounded.tokens.json" }]
     }
   },
   "modifiers": {

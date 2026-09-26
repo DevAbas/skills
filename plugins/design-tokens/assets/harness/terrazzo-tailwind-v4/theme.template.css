@@ -2,8 +2,10 @@
  * The Tailwind theme's template. Terrazzo fills each `@tz` with the tokens of
  * one context and writes the result to theme.generated.css. Everything here
  * is wiring Tailwind needs and states no value of its own: every value is a
- * token. A starting point from the design-tokens plugin; confirm the variant
- * syntax in Tailwind's dark mode documentation.
+ * token. A starting point from the design-tokens plugin, kept at
+ * design-system/theme.template.css; confirm the variant syntax in Tailwind's
+ * dark mode documentation. With one context there is no variant: the only
+ * rule is `@theme { @tz(tzMode: "."); }`.
  */
 
 /* Tailwind's default palette is removed: only the token roles make colour utilities. */

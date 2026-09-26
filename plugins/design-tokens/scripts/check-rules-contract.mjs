@@ -12,13 +12,14 @@
 //
 // Reads the front matter with the project's `yaml`, and the token ids with the
 // plugin's own DTCG reader (lib/dtcg.mjs). The settings come from
-// design-tokens.gates.json (`tokens`, lib/project-modules.mjs).
+// design-system/gates.json (`tokens`, lib/project-modules.mjs), then from the
+// flags check-tokens.mjs accepts (--resolver, --roles, --palette …).
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { readProjectTokens } from "./check-tokens.mjs";
-import { importFromProject, tokenSettings } from "./lib/project-modules.mjs";
+import { flagSettings, importFromProject, tokenSettings } from "./lib/project-modules.mjs";
 
 /** The keys a rules document's front matter may hold: identity, the import, the contract. */
 export const ALLOWED_KEYS = ["version", "name", "description", "imports", "components"];
@@ -66,7 +67,7 @@ export function contractProblems(front, tokenIds, settings) {
 
 async function main() {
   const root = process.cwd();
-  const settings = tokenSettings(root);
+  const settings = tokenSettings(root, flagSettings(process.argv.slice(2)));
   const { parse: parseYaml } = await importFromProject("yaml", root);
   const markdown = readFileSync(join(root, settings.rulesDocument), "utf8");
   const yaml = frontMatterText(markdown);

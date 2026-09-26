@@ -21,6 +21,10 @@ The rubric has four parts. Each gets one status in the report:
 
 There is no numeric score: a weighted number would be a threshold chosen by eye. The statuses and the findings are the result.
 
+## What is not a finding
+
+Paths and group names other than the canonical ones (`references/conventions.md`) are not a finding: DTCG does not prescribe them. The report records them in `stack.tokenSettings`, and renaming them is an optional `fix` batch.
+
 ## Severities
 
 | Severity | Meaning |

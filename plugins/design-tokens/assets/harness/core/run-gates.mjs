@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Runs one stage of design-tokens.gates.json outside an agent: the git
+// Runs one stage of design-system/gates.json outside an agent: the git
 // pre-commit hook and CI call it, so a person, an agent and CI pass the same
 // gates.
 //

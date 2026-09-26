@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Compares two audit reports by finding id: what a fix resolved, what is new,
-// what is unchanged.
+// what moved, what is unchanged. A finding that moved to a new location names
+// its earlier id in `previousIds`, so it is not counted as resolved and new.
 //
 //   node compare-reports.mjs <before.json> <after.json>          Markdown summary
 //   node compare-reports.mjs <before.json> <after.json> --json   the same as JSON
@@ -20,21 +21,39 @@ import { reportProblems } from "./render-report.mjs";
  */
 export function compareReports(before, after) {
   const beforeIds = new Map(before.findings.map((finding) => [finding.id, finding]));
-  const afterIds = new Map(after.findings.map((finding) => [finding.id, finding]));
+  const afterIds = new Set(after.findings.map((finding) => finding.id));
+  const unchanged = [];
+  const moved = [];
+  const added = [];
+  const claimed = new Set();
+  for (const finding of after.findings) {
+    if (beforeIds.has(finding.id)) {
+      unchanged.push(finding);
+      claimed.add(finding.id);
+      continue;
+    }
+    // The same problem at a new location names its earlier id (references/report.md, Moved findings).
+    const earlier = (finding.previousIds ?? []).find((id) => beforeIds.has(id) && !afterIds.has(id));
+    if (earlier) {
+      moved.push({ ...finding, movedFrom: earlier });
+      claimed.add(earlier);
+    } else added.push(finding);
+  }
   return {
-    resolved: [...beforeIds.values()].filter((finding) => !afterIds.has(finding.id)),
-    new: [...afterIds.values()].filter((finding) => !beforeIds.has(finding.id)),
-    unchanged: [...afterIds.values()].filter((finding) => beforeIds.has(finding.id)),
+    resolved: before.findings.filter((finding) => !claimed.has(finding.id)),
+    new: added,
+    moved,
+    unchanged,
   };
 }
 
 /** The comparison as Markdown, one list per outcome. */
 export function renderComparison(comparison, beforeName, afterName) {
   const lines = [`# Audit comparison`, "", `- Before: ${beforeName}`, `- After: ${afterName}`, ""];
-  for (const [title, findings] of [["Resolved", comparison.resolved], ["New", comparison.new], ["Unchanged", comparison.unchanged]]) {
+  for (const [title, findings] of [["Resolved", comparison.resolved], ["New", comparison.new], ["Moved", comparison.moved], ["Unchanged", comparison.unchanged]]) {
     lines.push(`## ${title} (${findings.length})`, "");
     if (findings.length === 0) lines.push("None.");
-    for (const finding of findings) lines.push(`- ${finding.severity}: \`${finding.id}\`: ${finding.title}`);
+    for (const finding of findings) lines.push(`- ${finding.severity}: \`${finding.id}\`${finding.movedFrom ? ` (was \`${finding.movedFrom}\`)` : ""}: ${finding.title}`);
     lines.push("");
   }
   return lines.join("\n");

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/resolver.json",
+  "name": "<Product name>",
+  "description": "<One sentence: the product and its tiers.> One context, so the resolver has sets and no modifier: a modifier needs two or more contexts (Resolver §4.1.5.1).",
+  "version": "2025.10",
+  "sets": {
+    "foundation": {
+      "description": "The palette and raw values.",
+      "sources": [{ "$ref": "foundation/palette.tokens.json" }, { "$ref": "foundation/font.tokens.json" }]
+    },
+    "semantic": {
+      "description": "Roles and styles.",
+      "sources": [{ "$ref": "semantic/color.tokens.json" }, { "$ref": "semantic/typography.tokens.json" }, { "$ref": "semantic/spacing.tokens.json" }, { "$ref": "semantic/rounded.tokens.json" }]
+    }
+  },
+  "resolutionOrder": [{ "$ref": "#/sets/foundation" }, { "$ref": "#/sets/semantic" }]
+}

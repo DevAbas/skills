@@ -66,6 +66,16 @@ describe("reportProblems", () => {
     assert.deepEqual(reportProblems(report), ["sources does not list https://www.designtokens.org/faq/, which a finding cites"]);
   });
 
+  it("accepts previousIds and dirty, and refuses malformed ones", () => {
+    const report = sampleReport();
+    report.project.dirty = true;
+    report.findings[0].previousIds = ["tiers/role-aliases-palette@DESIGN.md#colors"];
+    assert.deepEqual(reportProblems(report), []);
+    report.project.dirty = "yes";
+    report.findings[0].previousIds = ["colors"];
+    assert.deepEqual(reportProblems(report), ["project.dirty must be true or false", "findings[0].previousIds must list earlier finding ids (<ruleId>@<file>#<pointer>)"]);
+  });
+
   it("refuses what is not a report at all", () => {
     assert.deepEqual(reportProblems(null), ["the report is not a JSON object"]);
     assert.ok(reportProblems({}).length > 5);
@@ -102,6 +112,15 @@ describe("renderReport", () => {
     assert.match(markdown, /- Id: `tiers\/role-aliases-palette@tokens\/themes\/dark\.tokens\.json#color\.surface-overlay`/);
     assert.match(markdown, /- Evidence: `tokens\/themes\/dark\.tokens\.json:41`/);
     assert.match(markdown, /- Fix: Point it at the palette entry/);
+  });
+
+  it("shows a dirty tree and a finding's previous id", () => {
+    const report = sampleReport();
+    report.project.dirty = true;
+    report.findings[0].previousIds = ["tiers/role-aliases-palette@DESIGN.md#colors"];
+    const rendered = renderReport(report);
+    assert.match(rendered, /- Project: fixture-app \(`abc1234`\), with uncommitted changes/);
+    assert.match(rendered, /- Previously: `tiers\/role-aliases-palette@DESIGN\.md#colors`/);
   });
 
   it("escapes a pipe inside a table cell", () => {

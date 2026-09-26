@@ -17,18 +17,25 @@
 // - tiers/styles-alias-foundation: a text style's family and weight alias the
 //   font group.
 //
-//   node check-tokens.mjs [--root <project>]   exit 1 and one line per problem
+//   node check-tokens.mjs [--root <project>] [--resolver <path>] [--roles <group>]
+//                         [--palette <group>] [--typography <group>] [--fonts <group>]
+//   exit 1 and one line per problem; the last line says what was checked
+//
+// It never passes silently: a roles group that holds no token is a config
+// problem that names the groups the tokens do have, and the summary counts the
+// palette entries, roles and text styles it checked.
 //
 // No dependencies: it runs from the plugin on any project with DTCG files, and
 // the same file runs from a project that copied it. The settings come from the
-// project's design-tokens.gates.json (`tokens`, lib/project-modules.mjs).
+// project's design-system/gates.json (`tokens`, lib/project-modules.mjs), then
+// from the flags.
 
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { colorHex, derivedHex } from "./lib/color.mjs";
 import { loadResolver, loadTokenFiles, modifiersOf, resolveTokens } from "./lib/dtcg.mjs";
-import { tokenSettings } from "./lib/project-modules.mjs";
+import { flagSettings, readConfig, tokenSettings } from "./lib/project-modules.mjs";
 
 /**
  * The derived rule a token records, undefined when it has none, or a string saying why the rule is malformed.
@@ -127,6 +134,27 @@ export function tierProblems(contexts, settings, derive = derivedHex) {
   return problems;
 }
 
+/** The top-level groups the tokens have, in the order they appear. */
+export function topGroups(tokens) {
+  return [...new Set(Object.keys(tokens).map((id) => id.split(".")[0]))];
+}
+
+/**
+ * What the configured group names find in the tokens: a config problem when the roles group is empty (nothing
+ * could be checked), a tier problem when there is no palette, and the counts for the summary line.
+ */
+export function groupProblems(contexts, settings) {
+  const first = Object.values(contexts)[0] ?? {};
+  const found = topGroups(first);
+  const count = (group) => inGroup(first, group).length;
+  const counts = { palette: count(settings.palette), roles: count(settings.roles), styles: count(settings.typography) };
+  const hint = `the tokens have ${found.join(", ") || "no groups"}`;
+  const problems = [];
+  if (counts.roles === 0) problems.push(`config: no tokens in the roles group ${settings.roles}, so no role could be checked; ${hint}. Pass --roles <group>, or set tokens.roles in design-system/gates.json`);
+  if (counts.roles > 0 && counts.palette === 0) problems.push(`tiers/role-aliases-palette: there is no palette group ${settings.palette} for roles to alias; ${hint}. If the palette has another name, pass --palette <group>`);
+  return { problems, counts, found };
+}
+
 /**
  * The project's tokens, read through its resolver (or its plain token files), resolved once per context of the
  * theme modifier; and every problem the reader found, as format/dtcg-valid.
@@ -136,7 +164,7 @@ export function readProjectTokens(root, settings) {
   let source;
   if (existsSync(resolverPath)) source = loadResolver(resolverPath);
   else if (settings.files.length > 0) source = loadTokenFiles(settings.files.map((file) => join(root, file)));
-  else return { contexts: {}, problems: [`format/dtcg-valid: no resolver at ${settings.resolver}; set tokens.resolver, or tokens.files for plain token files, in design-tokens.gates.json`] };
+  else return { contexts: {}, problems: [`format/dtcg-valid: no resolver at ${settings.resolver}; pass --resolver <path>, or set tokens.resolver (or tokens.files for plain token files) in design-system/gates.json`] };
   const contextNames = modifiersOf(source)[settings.modifier]?.contexts ?? [];
   const inputs = contextNames.length > 0 ? contextNames.map((context) => [context, { [settings.modifier]: context }]) : [["default", {}]];
   const problems = new Set();
@@ -152,14 +180,20 @@ export function readProjectTokens(root, settings) {
 function main(argv) {
   const at = argv.indexOf("--root");
   const root = at === -1 ? process.cwd() : argv[at + 1];
-  const settings = tokenSettings(root);
+  const { notes } = readConfig(root);
+  for (const note of notes) console.error(`note: ${note}`);
+  const settings = tokenSettings(root, flagSettings(argv));
   const { contexts, problems: formatProblems } = readProjectTokens(root, settings);
-  const problems = [...formatProblems, ...(Object.keys(contexts).length > 0 ? tierProblems(contexts, settings) : [])];
+  const names = Object.keys(contexts);
+  const groups = names.length > 0 ? groupProblems(contexts, settings) : { problems: [], counts: { palette: 0, roles: 0, styles: 0 } };
+  const problems = [...formatProblems, ...groups.problems, ...(groups.counts.roles > 0 ? tierProblems(contexts, settings) : [])];
+  const { palette, roles, styles } = groups.counts;
+  const checked = `checked ${palette} palette entries (${settings.palette}), ${roles} roles (${settings.roles}) and ${styles} text styles (${settings.typography}) in ${names.join(", ") || "no context"}`;
   if (problems.length > 0) {
-    console.error(`The tokens break the rules:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
+    console.error(`The tokens break the rules:\n${problems.map((problem) => `  - ${problem}`).join("\n")}\ncheck-tokens: ${checked}`);
     return 1;
   }
-  console.log(`check-tokens: the format and tier rules hold in ${Object.keys(contexts).join(", ")}`);
+  console.log(`check-tokens: ${checked}; the format and tier rules hold`);
   return 0;
 }
 

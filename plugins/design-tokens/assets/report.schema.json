@@ -22,7 +22,8 @@
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "root": { "type": "string" },
-        "commit": { "type": ["string", "null"] }
+        "commit": { "type": ["string", "null"] },
+        "dirty": { "type": "boolean" }
       }
     },
     "date": { "type": "string", "format": "date" },
@@ -34,6 +35,7 @@
         "tokenFormat": { "type": ["string", "null"] },
         "styling": { "type": "array", "items": { "type": "string" } },
         "rulesDocument": { "type": ["string", "null"] },
+        "tokenSettings": { "type": "object" },
         "versions": {
           "type": "object",
           "additionalProperties": {
@@ -92,6 +94,7 @@
               }
             }
           },
+          "previousIds": { "type": "array", "items": { "type": "string", "pattern": "^[a-z]+/[a-z0-9-]+@[^\\s]*#[^\\s]*$" } },
           "why": { "type": "string", "minLength": 1 },
           "source": { "type": "string" },
           "fix": { "type": "string", "minLength": 1 }

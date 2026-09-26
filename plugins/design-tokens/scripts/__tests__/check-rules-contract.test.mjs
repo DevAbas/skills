@@ -7,7 +7,7 @@ const tokenIds = new Set(["color.surface", "color.on-surface", "typography.body-
 const valid = {
   version: "alpha",
   name: "App",
-  imports: "./tokens/design.resolver.json",
+  imports: "./design-system/tokens/design.resolver.json",
   components: { page: { backgroundColor: "{color.surface}", textColor: "{color.on-surface}", typography: "{typography.body-md}", rounded: "{rounded.md}" } },
 };
 
@@ -27,7 +27,7 @@ describe("contractProblems", () => {
     const front = { ...valid, colors: { primary: "#00aa88" }, imports: "./tokens.json" };
     assert.deepEqual(contractProblems(front, tokenIds, TOKEN_DEFAULTS), [
       "docs/rules-hold-no-values: the front matter holds `colors:`; values live in the token files it imports, the rules document holds rules",
-      "docs/rules-reference-existing-tokens: `imports:` is ./tokens.json; it names the tokens at ./tokens/design.resolver.json",
+      "docs/rules-reference-existing-tokens: `imports:` is ./tokens.json; it names the tokens at ./design-system/tokens/design.resolver.json",
     ]);
   });
 

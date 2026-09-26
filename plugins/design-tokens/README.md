@@ -33,10 +33,10 @@ Read this before you install. The plugin is opinionated in two layers: standards
 | Part | Works with | Adds to your project |
 |---|---|---|
 | The plugin itself | Claude Code, Node.js 20 or later | Nothing. Its scripts have no dependencies, including its own DTCG reader and colour maths |
-| `audit` | Any web stack. On a project with DTCG files it also runs the token check, deterministically, with no install | Only its reports, in `design-tokens-audit/` |
+| `audit` | Any web stack. On a project with DTCG files it also runs the token check, deterministically, with no install | Only its reports, in `design-system/audits/` |
 | `fix` | Any web stack | What the approved plan names. Every new dependency is asked for first |
 | `setup` | Web. It proposes the Terrazzo + Tailwind v4 profile, and other stacks choose a build tool with you | Token files, `DESIGN.md`, the build config, and the approved dependencies |
-| `harness`, core gates and checks | Any web stack that runs Node. The token check and the rules-document check are copied as plain scripts | `design-tokens.gates.json`, `.claude/hooks/design-tokens/`, a git pre-commit hook, an optional CI job. Changes to `.claude/settings.json`, git hooks, `package.json` or CI are asked for first |
+| `harness`, core gates and checks | Any web stack that runs Node. The token check and the rules-document check are copied as plain scripts | `design-system/gates.json`, `design-system/checks/`, `.claude/hooks/design-tokens/`, a git pre-commit hook, an optional CI job. Changes to `.claude/settings.json`, git hooks, `package.json` or CI are asked for first |
 | `harness`, profile checks | The profile below | The build staleness check and the ESLint rules, adapted from the plugin |
 
 ### Profile: Terrazzo + Tailwind CSS v4
@@ -61,14 +61,18 @@ The only profile today. It assumes **Tailwind CSS v4**, and builds the Tailwind 
 - Native platforms: iOS, Android, React Native.
 - Agents other than Claude Code.
 
+## The layout it creates
+
+`setup` creates, and the checks default to, one layout: `DESIGN.md` at the root, and everything else under `design-system/`: the DTCG tokens in `tokens/` (foundation, semantic, themes, one resolver), the copied checks in `checks/`, the audit reports in `audits/`, and the settings in `gates.json`. A project with other paths or group names keeps them and states them in `gates.json`; the audit does not count that against it. See `references/conventions.md`.
+
 ## Skills
 
 | Skill | What it does |
 |---|---|
 | `/design-tokens:setup` | Plans a token architecture for a new project, waits for approval, then builds it: resolver, palette from seeds, roles per theme, derived states, `DESIGN.md`, and the build |
-| `/design-tokens:audit` | Scans the project and checks it against the Token Architecture rubric: naming, tiers, format, docs. Writes `design-tokens-audit/<UTC stamp>.json`, for example `2026-09-26T143005Z.json`, and its Markdown. Changes nothing else |
+| `/design-tokens:audit` | Scans the project and checks it against the Token Architecture rubric: naming, tiers, format, docs. Writes `design-system/audits/<UTC stamp>.json`, for example `2026-09-26T143005Z.json`, and its Markdown. Changes nothing else |
 | `/design-tokens:fix` | Takes finding ids from a report, plans each fix, waits for approval, implements, then re-audits and compares the reports to show what closed |
-| `/design-tokens:harness` | Installs the gates a report recommends: token and rules checks, a staleness check, ESLint rules, Claude Code hooks, a git pre-commit hook and CI, all from one `design-tokens.gates.json`. Proves each gate by making it fail once |
+| `/design-tokens:harness` | Installs the gates a report recommends: token and rules checks, a staleness check, ESLint rules, Claude Code hooks, a git pre-commit hook and CI, all from one `design-system/gates.json`. Proves each gate by making it fail once |
 
 The audit runs its analysis in a read-only subagent, `design-tokens:token-auditor`.
 

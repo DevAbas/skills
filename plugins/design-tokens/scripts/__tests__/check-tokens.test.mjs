@@ -3,7 +3,8 @@ import { describe, it } from "node:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { derivedRuleOf, readProjectTokens, tierProblems } from "../check-tokens.mjs";
+import { derivedRuleOf, groupProblems, readProjectTokens, tierProblems } from "../check-tokens.mjs";
+import { flagSettings, readConfig, tokenSettings } from "../lib/project-modules.mjs";
 import { TOKEN_DEFAULTS } from "../lib/project-modules.mjs";
 
 const settings = { ...TOKEN_DEFAULTS, extensionKey: "com.example.design" };
@@ -92,10 +93,10 @@ describe("readProjectTokens", () => {
 
   it("resolves each context of the theme modifier, and the tier rules pass on them", () => {
     const root = write({
-      "tokens/palette.tokens.json": palette,
-      "tokens/light.tokens.json": theme("gray-1"),
-      "tokens/dark.tokens.json": theme("gray-12"),
-      "tokens/design.resolver.json": { version: "2025.10", sets: { base: { sources: [{ $ref: "palette.tokens.json" }] } }, modifiers: { theme: { contexts: { light: [{ $ref: "light.tokens.json" }], dark: [{ $ref: "dark.tokens.json" }] }, default: "light" } }, resolutionOrder: [{ $ref: "#/sets/base" }, { $ref: "#/modifiers/theme" }] },
+      "design-system/tokens/foundation/palette.tokens.json": palette,
+      "design-system/tokens/themes/light.tokens.json": theme("gray-1"),
+      "design-system/tokens/themes/dark.tokens.json": theme("gray-12"),
+      "design-system/tokens/design.resolver.json": { version: "2025.10", sets: { base: { sources: [{ $ref: "foundation/palette.tokens.json" }] } }, modifiers: { theme: { contexts: { light: [{ $ref: "themes/light.tokens.json" }], dark: [{ $ref: "themes/dark.tokens.json" }] }, default: "light" } }, resolutionOrder: [{ $ref: "#/sets/base" }, { $ref: "#/modifiers/theme" }] },
     });
     try {
       const { contexts, problems } = readProjectTokens(root, settings);
@@ -110,9 +111,9 @@ describe("readProjectTokens", () => {
 
   it("reports a modifier with one context as format/dtcg-valid", () => {
     const root = write({
-      "tokens/palette.tokens.json": palette,
-      "tokens/dark.tokens.json": theme("gray-12"),
-      "tokens/design.resolver.json": { version: "2025.10", sets: { base: { sources: [{ $ref: "palette.tokens.json" }] } }, modifiers: { theme: { contexts: { dark: [{ $ref: "dark.tokens.json" }] }, default: "dark" } }, resolutionOrder: [{ $ref: "#/sets/base" }, { $ref: "#/modifiers/theme" }] },
+      "design-system/tokens/foundation/palette.tokens.json": palette,
+      "design-system/tokens/themes/dark.tokens.json": theme("gray-12"),
+      "design-system/tokens/design.resolver.json": { version: "2025.10", sets: { base: { sources: [{ $ref: "foundation/palette.tokens.json" }] } }, modifiers: { theme: { contexts: { dark: [{ $ref: "themes/dark.tokens.json" }] }, default: "dark" } }, resolutionOrder: [{ $ref: "#/sets/base" }, { $ref: "#/modifiers/theme" }] },
     });
     try {
       const { problems } = readProjectTokens(root, settings);
@@ -125,7 +126,57 @@ describe("readProjectTokens", () => {
   it("says where to point it when there is no resolver and no files", () => {
     const root = write({});
     try {
-      assert.match(readProjectTokens(root, settings).problems[0], /no resolver at tokens\/design.resolver.json/);
+      assert.match(readProjectTokens(root, settings).problems[0], /no resolver at design-system\/tokens\/design.resolver.json/);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe("groupProblems: no silent pass", () => {
+  const ctx = (tokens) => ({ dark: tokens });
+  const color = { $type: "color", $value: { hex: "#111111" } };
+
+  it("names the groups the tokens have when the roles group is empty", () => {
+    const { problems, counts } = groupProblems(ctx({ "colors.surface": color, "typography.body": { $type: "typography" } }), settings);
+    assert.deepEqual(counts, { palette: 0, roles: 0, styles: 1 });
+    assert.equal(problems.length, 1);
+    assert.match(problems[0], /^config: no tokens in the roles group color, so no role could be checked; the tokens have colors, typography\. Pass --roles <group>/);
+  });
+
+  it("reports a missing palette as a tier problem once roles exist", () => {
+    const { problems } = groupProblems(ctx({ "colors.surface": color }), { ...settings, roles: "colors" });
+    assert.deepEqual(problems, ["tiers/role-aliases-palette: there is no palette group palette for roles to alias; the tokens have colors. If the palette has another name, pass --palette <group>"]);
+  });
+
+  it("finds nothing to report, and counts, when the names match", () => {
+    const { problems, counts } = groupProblems(contexts(), settings);
+    assert.deepEqual(problems, []);
+    assert.deepEqual(counts, { palette: 2, roles: 3, styles: 1 });
+  });
+});
+
+describe("settings", () => {
+  it("defaults to the canonical layout, and lets flags override the config", () => {
+    const root = mkdtempSync(join(tmpdir(), "design-tokens-settings-"));
+    try {
+      assert.equal(tokenSettings(root).resolver, "design-system/tokens/design.resolver.json");
+      mkdirSync(join(root, "design-system"));
+      writeFileSync(join(root, "design-system/gates.json"), JSON.stringify({ tokens: { roles: "colors", resolver: "tokens/r.json" } }));
+      assert.equal(tokenSettings(root).roles, "colors");
+      assert.deepEqual(tokenSettings(root, flagSettings(["--roles", "role", "--resolver", "x.json"])), { ...tokenSettings(root), roles: "role", resolver: "x.json" });
+      assert.deepEqual(readConfig(root).notes, []);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it("still reads the 0.3.x config at the root, with a note to move it", () => {
+    const root = mkdtempSync(join(tmpdir(), "design-tokens-settings-"));
+    try {
+      writeFileSync(join(root, "design-tokens.gates.json"), JSON.stringify({ tokens: { roles: "colors" } }));
+      assert.equal(tokenSettings(root).roles, "colors");
+      assert.match(readConfig(root).notes[0], /move it to design-system\/gates.json/);
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

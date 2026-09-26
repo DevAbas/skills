@@ -5,8 +5,10 @@
 ## Files
 
 The audit writes two files into the audited project:
-- `design-tokens-audit/<stamp>.json`: the source. `fix`, `harness` and `compare-reports` read it.
-- `design-tokens-audit/<stamp>.md`: rendered from the JSON by `scripts/render-report.mjs`. Never written by hand.
+- `design-system/audits/<stamp>.json`: the source. `fix`, `harness` and `compare-reports` read it.
+- `design-system/audits/<stamp>.md`: rendered from the JSON by `scripts/render-report.mjs`. Never written by hand.
+
+Before 0.4.0 reports went to `design-tokens-audit/`. `fix` and `harness` still read that folder.
 
 **The stamp** is the UTC time of the audit, to the second, with no separators inside the time: `2026-09-26T143005Z`. It comes from `date -u +%Y-%m-%dT%H%M%SZ`. Name order is then time order, so the last name is the newest report. A date with a counter (`2026-09-26-2`) does not have that property: it sorts before `2026-09-26`.
 
@@ -20,9 +22,9 @@ The audit never deletes an older report, because comparing two reports is how a 
 |---|---|
 | `schemaVersion` | `"1"` |
 | `tool` | `{ "name": "design-tokens", "version": "<plugin.json version>" }` |
-| `project` | `{ "name", "root", "commit" }`; `commit` is the short hash when the project is a git repository |
+| `project` | `{ "name", "root", "commit", "dirty" }`; `commit` is the short hash when the project is a git repository, and `dirty` is true when `git status --porcelain` lists changes, so the report says it audited uncommitted work |
 | `date` | ISO date of the audit |
-| `stack` | `profile` (`"terrazzo-tailwind-v4"` or `null`), `tokenFormat`, `styling`, `rulesDocument`, and `versions`: per tool, `installed` and, when checked, `latest` |
+| `stack` | `profile` (`"terrazzo-tailwind-v4"` or `null`), `tokenFormat`, `styling`, `rulesDocument`, `tokenSettings` (the resolver path and group names the checks used, when they differ from `conventions.md`), and `versions`: per tool, `installed` and, when checked, `latest` |
 | `parts` | The four parts (`naming`, `tiers`, `format`, `docs`), each with `status` and a one-sentence `summary` |
 | `findings` | See below |
 | `gates` | See below |
@@ -54,6 +56,8 @@ The audit never deletes an older report, because comparing two reports is how a 
 The id must not contain a line number: a line moves when unrelated code changes, and the id must stay the same from one audit to the next. The line goes in `evidence`.
 
 **Grouping:** one finding per rule and place. A rule broken in forty files is one finding per file, capped at the ten files with the most matches. When the cap drops files, a further finding, `<ruleId>@project#total` with severity `info`, gives the total count and lists the dropped files as evidence. It is `info` because its errors are already counted in the per-file findings: counting them again would inflate the result. `render-report.mjs` refuses a `#total` finding with any other severity.
+
+**Moved findings:** when the same problem is now at a new location (its values moved to another file, or a group was renamed), the finding keeps the new id and lists the old one in `previousIds`. `compare-reports` then shows it as moved, not as one resolved and one new finding.
 
 **One value in two documents:** a value the rules document and the code both state is one `docs/rules-hold-no-values` finding at the document location, with each code location as evidence. It is not one finding per code file under `format/single-source-build`, which is about generated outputs.
 

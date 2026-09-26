@@ -1,5 +1,6 @@
 // What the design-token gates share: the project's gates config
-// (design-tokens.gates.json at the repository root), glob matching, the hook's
+// (design-system/gates.json; design-tokens.gates.json at the root before 0.4.0),
+// glob matching, the hook's
 // JSON input, and running a command. Copied into a project by
 // /design-tokens:harness; the config, not this file, is what a project edits.
 //
@@ -8,10 +9,11 @@
 // later.
 
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 
-export const CONFIG_FILE = "design-tokens.gates.json";
+export const CONFIG_FILES = ["design-system/gates.json", "design-tokens.gates.json"];
+export const CONFIG_FILE = CONFIG_FILES[0];
 
 /**
  * A glob as a regular expression over a relative, forward-slash path:
@@ -78,9 +80,11 @@ export function gatesProblems(config) {
 
 /** The project's gates config; throws with every problem when it is malformed. */
 export function readGates(root = process.cwd()) {
-  const config = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
+  const file = CONFIG_FILES.find((candidate) => existsSync(join(root, candidate)));
+  if (!file) throw new Error(`no gates config: write ${CONFIG_FILE} (references/conventions.md)`);
+  const config = JSON.parse(readFileSync(join(root, file), "utf8"));
   const problems = gatesProblems(config);
-  if (problems.length > 0) throw new Error(`${CONFIG_FILE}:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
+  if (problems.length > 0) throw new Error(`${file}:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
   return config;
 }
 

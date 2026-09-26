@@ -12,19 +12,15 @@ When it has Tailwind v4 but no Terrazzo, the profile is still the recommendation
 
 ## Layout
 
+The token files follow the canonical layout (`references/conventions.md`), under `design-system/tokens/`. This profile adds:
+
 ```
-tokens/
-  <name>.resolver.json            # sets + the theme modifier (DTCG Resolver)
-  foundation/*.tokens.json        # palette (literal values), font families and weights, raw scales
-  semantic/*.tokens.json          # roles and styles that are the same in every theme (typography, radius, spacing)
-  themes/<context>.tokens.json    # colour roles and shadows, per context
-terrazzo.config.ts                # tokens → CSS variables + Tailwind theme
-src/styles/theme.template.css     # the Tailwind wiring, filled by Terrazzo (hand-written, holds no values)
-src/styles/*.generated.css        # built outputs, never edited
-DESIGN.md                         # rules; imports: the resolver
+terrazzo.config.ts                    # at the root, where Terrazzo looks for it: tokens → CSS variables + Tailwind theme
+design-system/theme.template.css      # the Tailwind wiring, filled by Terrazzo (hand-written, holds no values)
+<framework path>/*.generated.css      # built outputs, never edited (src/styles/, or app/ in Next.js)
 ```
 
-Paths are the project's choice. Record them once, in the gates config (`design-tokens.gates.json`), and let every check read them from there.
+A project with other paths records them once, in `design-system/gates.json`, and every check reads them from there.
 
 ## Build
 
@@ -90,6 +86,16 @@ Found while migrating a real project, and confirmed in Terrazzo 2.7.1. Re-check 
 - **One context is a set, not a modifier.** A modifier must declare two or more contexts (Resolver §4.1.5.1; the resolver schema's `minProperties: 2`), so a single theme goes in a set, and the resolver has no modifier. Terrazzo accepts a one-context modifier, but the file is not valid DTCG, and `check-tokens.mjs` reports it.
   - With no modifier, the template uses `@tz(tzMode: ".")`: Terrazzo documents `tzMode` as its virtual modifier for tokens without resolver modifiers, and warns against mixing it with resolver modifiers.
   - A missing or wrong argument (`@tz()`, `@tz(tzMode: "nope")`) builds an empty `@theme` with exit 0 and only a "matched 0 tokens" warning. `check-generated.mjs` fails on an output with no tokens for this reason.
-- **A DTCG `lineHeight` is a unitless ratio** (`36/28` is `1.2857…`). CSS inherits a unitless line height as a ratio, so a child that changes font size without its own text style gets a different line height than it did with a px value.
-  - Keep the ratio: a px `lineHeight` is not valid DTCG, even though Terrazzo accepts it.
-  - When a migration changes rendering, give that element its own `text-<role>` class (decisions, Text styles).
+- **Line height is a ratio, and its product must not fall below the pixel value.**
+  - *The standards.*
+    - DTCG requires a number: `lineHeight` "MUST be a valid number value or a reference to a number token" (Format 2025.10, §9.8, https://www.designtokens.org/tr/2025.10/format/).
+    - CSS multiplies a number by each element's font size and inherits the number (CSS 2.1 §10.8.1, https://www.w3.org/TR/CSS2/visudet.html).
+    - MDN calls the unitless number "the preferred way" (https://developer.mozilla.org/en-US/docs/Web/CSS/line-height).
+    - Tailwind v4's own defaults are ratios, for example `--text-sm--line-height: calc(1.25 / 0.875)` (tailwindlabs/tailwindcss, packages/tailwindcss/theme.css).
+  - *What a browser does with it.* Blink stores the number as a 32-bit float percentage (`style_builder_converter.cc`, `ConvertLineHeight`), truncates the used height to 1/64 px (`layout_unit.h`, `length_functions.cc`), and floors the top half-leading to a whole pixel (`line_utils.cc`). So a product a hair under the intended pixel (36/28 × 28 = 35.99…) moves the text up by one pixel.
+  - *The rule.* Store the smallest ratio with 4 decimals whose product with the font size is not below the pixel line height (`1.2858` for 36/28). It stays a DTCG number and lays out as the whole pixel. Do not store px: it is not valid DTCG, even though Terrazzo accepts it.
+  - *Inheritance.* A child that changes font size without its own text style gets the ratio times its own size. When a migration from px changes rendering, give that element its own `text-<role>` class (decisions, Text styles).
+- **Tailwind does not apply `--text-*--font-family`.** A `text-*` utility sets the font size and the `--line-height`, `--letter-spacing` and `--font-weight` sub-properties (https://tailwindcss.com/docs/font-size). The family Terrazzo writes beside them has no effect.
+  - Wire the family separately: a `font-*` utility from the `font` group, or the framework's font loader (Next.js `next/font`).
+  - Gate that the loaded family matches `font.family.*`, so a change to the token is not silently ignored.
+- **Measure before you blame a token.** A visual problem after a token change is measured first (element rects, text ranges, computed styles, before and after). Text that is centred by its box but looks off-centre is optical: the box includes the font's ascent and descent, and `text-box: trim-both cap alphabetic` (CSS Inline 3) is the standard remedy. It is a design decision, not a token fix.

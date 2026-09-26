@@ -12,8 +12,11 @@
 //   mapped, so no class can name a primitive.
 //
 // DESIGN_TOKENS_OUT_DIR builds elsewhere, for check-generated.mjs.
-// Replace: the resolver path, the modifier (`theme`) and its contexts, the
-// output folder, and the groups in `theme` with the project's own.
+// This is the two-context form (a `theme` modifier with light and dark). With
+// one context the resolver has no modifier: drop the plugin-css permutations
+// and write `@tz(tzMode: ".")` in the template (profile, Pitfalls).
+// Replace the output folder with the framework's, and keep the paths and group
+// names of references/conventions.md unless the project has its own.
 
 import { resolve } from "node:path";
 import { defineConfig } from "@terrazzo/cli";
@@ -22,7 +25,7 @@ import css from "@terrazzo/plugin-css";
 import tailwind from "@terrazzo/plugin-tailwind";
 
 export default defineConfig({
-  tokens: ["./tokens/design.resolver.json"],
+  tokens: ["./design-system/tokens/design.resolver.json"],
   outDir: process.env.DESIGN_TOKENS_OUT_DIR ?? "./src/styles/",
   lint: {
     // Setting lint.rules replaces Terrazzo's recommended rules instead of adding to them (it applies
@@ -42,7 +45,7 @@ export default defineConfig({
       ],
     }),
     tailwind({
-      template: resolve("src/styles/theme.template.css"),
+      template: resolve("design-system/theme.template.css"),
       filename: "theme.generated.css",
       theme: {
         color: ["color.*"],

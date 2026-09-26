@@ -21,6 +21,8 @@ import { pathToFileURL } from "node:url";
 
 /** Folders never walked: dependencies, build output, version control, earlier audits. */
 const SKIPPED = new Set(["node_modules", ".git", ".next", ".nuxt", ".svelte-kit", ".turbo", ".vercel", ".output", "dist", "build", "out", "coverage", "storybook-static", "design-tokens-audit"]);
+/** Folders skipped by their path from the root: the audit reports of the canonical layout (references/conventions.md). */
+const SKIPPED_PATHS = new Set(["design-system/audits"]);
 /** Source files scanned for raw colours. */
 const SOURCE = /\.(tsx?|jsx?|mjs|cjs|vue|svelte|astro|html|css|scss|sass|less)$/;
 /** The packages that say how a project styles and builds tokens. */
@@ -46,7 +48,8 @@ export function listFiles(root) {
     }
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        if (!SKIPPED.has(entry.name)) walk(join(dir, entry.name));
+        const path = relative(root, join(dir, entry.name)).split("\\").join("/");
+        if (!SKIPPED.has(entry.name) && !SKIPPED_PATHS.has(path)) walk(join(dir, entry.name));
       } else if (entry.isFile()) files.push(relative(root, join(dir, entry.name)).split("\\").join("/"));
     }
   };
@@ -78,6 +81,9 @@ export function frontMatterKeys(markdown) {
  */
 export function isRulesDocumentCandidate(file) {
   if (!/\.mdx?$/i.test(file)) return false;
+  // Agent and editor configuration (.agents/, .claude/, …) and static site content (public/) describe design
+  // systems in general; they are not this project's rules. DESIGN.md itself is still found anywhere.
+  if (/(^|\/)(\.[^/]+|public)\//.test(file) && basename(file) !== "DESIGN.md") return false;
   const name = basename(file).toLowerCase();
   if (name === "design.md" || /design[-_ ]?system|design[-_ ]?tokens|style[-_ ]?guide|^tokens\.mdx?$/.test(name)) return true;
   return /(^|\/)docs\//.test(file) && name.includes("design");
@@ -148,8 +154,9 @@ export function scanProject(root) {
   const gates = {
     claudeSettings: [".claude/settings.json", ".claude/settings.local.json"].filter(has),
     claudeHooks: files.filter((file) => file.startsWith(".claude/hooks/")),
-    gatesConfig: has("design-tokens.gates.json") ? "design-tokens.gates.json" : null,
-    gitHooks: files.filter((file) => /^(\.githooks|\.husky)\//.test(file) || /^(lefthook|\.lefthook)\.ya?ml$/.test(file)),
+    gatesConfig: ["design-system/gates.json", "design-tokens.gates.json"].find(has) ?? null,
+    // Husky keeps its own scripts in .husky/_/; the project's hooks are the files beside that folder.
+    gitHooks: files.filter((file) => (/^(\.githooks|\.husky)\//.test(file) && !file.startsWith(".husky/_/")) || /^(lefthook|\.lefthook)\.ya?ml$/.test(file)),
     ciWorkflows: files.filter((file) => /^\.github\/workflows\/.+\.ya?ml$/.test(file)),
     eslintConfig: files.filter((file) => /^eslint\.config\.[cm]?[jt]s$/.test(file) || /^\.eslintrc/.test(file)),
     stylelintConfig: files.filter((file) => /^(stylelint\.config\.[cm]?js|\.stylelintrc)/.test(file)),

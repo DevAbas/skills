@@ -1,5 +1,5 @@
 // PreToolUse, Bash: an agent's `git commit` runs the `beforeCommit` commands
-// of design-tokens.gates.json first, and is refused when any fails. Any other
+// of design-system/gates.json first, and is refused when any fails. Any other
 // command passes at once. A person's commit runs the same commands through
 // the git pre-commit hook (run-gates.mjs before-commit).
 

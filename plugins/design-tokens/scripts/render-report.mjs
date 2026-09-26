@@ -34,6 +34,7 @@ export function reportProblems(report) {
   if (r.tool?.name !== "design-tokens" || !isText(r.tool?.version)) problems.push("tool needs name \"design-tokens\" and a version");
   if (!isText(r.project?.name)) problems.push("project.name is missing");
   if (typeof r.project?.root !== "string") problems.push("project.root is missing");
+  if (r.project?.dirty !== undefined && typeof r.project.dirty !== "boolean") problems.push("project.dirty must be true or false");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(r.date ?? ""))) problems.push("date is not an ISO date (YYYY-MM-DD)");
   if (!r.stack || typeof r.stack !== "object" || !("profile" in r.stack)) problems.push("stack.profile is missing (null when no profile applies)");
 
@@ -66,6 +67,7 @@ export function reportProblems(report) {
       if (isText(finding.id) && finding.id.endsWith("@project#total") && finding.severity !== "info") problems.push(`${at} is a group total (${finding.id}), so its severity is info, not ${finding.severity}`);
       for (const field of ["title", "why", "fix"]) if (!isText(finding[field])) problems.push(`${at}.${field} is missing`);
       if (typeof finding.location?.file !== "string") problems.push(`${at}.location.file is missing`);
+      if (finding.previousIds !== undefined && (!Array.isArray(finding.previousIds) || finding.previousIds.some((id) => !isText(id) || !id.includes("@") || !id.includes("#")))) problems.push(`${at}.previousIds must list earlier finding ids (<ruleId>@<file>#<pointer>)`);
     });
   }
 
@@ -122,7 +124,7 @@ export function renderReport(report) {
   const lines = [];
   const { project, tool, stack } = report;
   lines.push("# Design Token Architecture Audit", "");
-  lines.push(`- Project: ${project.name}${project.commit ? ` (${code(project.commit)})` : ""}`);
+  lines.push(`- Project: ${project.name}${project.commit ? ` (${code(project.commit)})` : ""}${project.dirty ? ", with uncommitted changes" : ""}`);
   lines.push(`- Date: ${report.date}`);
   lines.push(`- Profile: ${stack.profile ?? "none (core rules only)"}`);
   if (stack.tokenFormat) lines.push(`- Token format: ${stack.tokenFormat}`);
@@ -149,6 +151,7 @@ export function renderReport(report) {
       lines.push(`#### ${finding.severity}: ${finding.title}`, "");
       lines.push(`- Rule: ${code(finding.ruleId)}`);
       lines.push(`- Id: ${code(finding.id)}`);
+      if (finding.previousIds?.length) lines.push(`- Previously: ${finding.previousIds.map(code).join(", ")}`);
       lines.push(`- Location: ${code(finding.location.file)}${finding.location.pointer ? ` at ${code(finding.location.pointer)}` : ""}`);
       for (const evidence of finding.evidence ?? []) {
         const where = `${evidence.file}${evidence.line ? `:${evidence.line}` : ""}`;

@@ -1,0 +1,5 @@
+{
+  "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
+  "$description": "Text styles. fontFamily and fontWeight alias font.*; lineHeight is a ratio (conventions.md; profile, Pitfalls).",
+  "typography": { "$type": "typography" }
+}
