@@ -5,7 +5,7 @@
 //   `imports:` and the `components:` contract, never token values;
 // - `imports:` names the project's resolver;
 // - tiers/components-read-roles: every contract property names a token
-//   (`{color.primary}`), never a value and never the palette;
+//   (`{colors.primary}`), never a value and never the palette;
 // - docs/rules-reference-existing-tokens: every token it names exists.
 //
 //   node check-rules-contract.mjs        exit 1 and one line per problem
@@ -36,7 +36,7 @@ export function frontMatterText(markdown) {
 /**
  * Every broken contract rule, one sentence each, prefixed with its rubric rule id.
  * @param {Record<string, unknown>} front the parsed front matter
- * @param {ReadonlySet<string>} tokenIds every token id in the tokens (`color.primary`)
+ * @param {ReadonlySet<string>} tokenIds every token id in the tokens (`colors.primary`)
  * @param {typeof import("./lib/project-modules.mjs").TOKEN_DEFAULTS} settings
  */
 export function contractProblems(front, tokenIds, settings) {

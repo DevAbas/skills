@@ -27,6 +27,9 @@ Also check whether a newer version than 2025.10 exists (https://www.designtokens
 | Terrazzo | https://terrazzo.app/docs/ | CLI commands (`tz build`, `tz check`), config shape (`tokens`, `outDir`, `plugins`, `lint.rules`) |
 | Terrazzo resolvers | https://terrazzo.app/docs/guides/resolvers/ | How a resolver is passed in and how each context is built |
 | Terrazzo Tailwind | https://terrazzo.app/docs/integrations/tailwind/ | `template`, `@tz (…)` syntax, `theme` mapping, typography sub-properties |
+| Claude Code hooks | https://code.claude.com/docs/en/hooks | Hook input, exit code 2 per event (PreToolUse blocks, PostToolUse reports after the tool ran), and the Bash `tool_response.bashEditDiff` changed-file list |
+| Claude Code settings | https://code.claude.com/docs/en/settings-reference | `bashEditDiffEnabled`: its scope (user or managed only) and version |
+| Terrazzo JS | https://terrazzo.app/docs/integrations/js | `@terrazzo/plugin-js`: `filename`, `contexts`, `properties`, the `resolver.apply()` output, and its advice to keep it server-side |
 | Terrazzo lint | https://terrazzo.app/docs/linting/ | Built-in rules and options (`core/consistent-naming`, `core/descriptions`, `a11y/min-contrast`), the custom rule API |
 | Terrazzo parser types | `node_modules/@terrazzo/parser/dist/types.d.ts` | `RECOMMENDED_CONFIG`, `LintRule`, and anything a custom Terrazzo lint rule needs. The plugin's own checks read DTCG with `scripts/lib/dtcg.mjs` |
 | Tailwind CSS v4 | https://tailwindcss.com/docs/theme | `@theme` namespaces, `--*: initial` resets, `@theme inline`, `--text-*--line-height` sub-properties |

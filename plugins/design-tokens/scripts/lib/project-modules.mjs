@@ -27,7 +27,7 @@ export const TOKEN_DEFAULTS = {
   /** The group of literal values (the palette). */
   palette: "palette",
   /** The group of colour roles. */
-  roles: "color",
+  roles: "colors",
   /** The group of text styles, and the group their family and weight must alias. */
   typography: "typography",
   fonts: "font",
@@ -38,13 +38,13 @@ export const TOKEN_DEFAULTS = {
   /** The rules document. */
   rulesDocument: "DESIGN.md",
   /** The token groups a component in the rules document's contract may read. */
-  readable: ["color", "typography", "rounded"],
+  readable: ["colors", "typography", "rounded"],
 };
 
 /** The command-line flags a check accepts, each overriding one setting. */
 export const SETTING_FLAGS = { "--resolver": "resolver", "--roles": "roles", "--palette": "palette", "--typography": "typography", "--fonts": "fonts", "--modifier": "modifier" };
 
-/** The settings named by flags in `argv` (`--roles colors`). */
+/** The settings named by flags in `argv` (`--roles color`). */
 export function flagSettings(argv = []) {
   const settings = {};
   for (let i = 0; i < argv.length; i++) {

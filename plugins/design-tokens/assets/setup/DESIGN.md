@@ -16,7 +16,7 @@ components: {}
 
 ### Reading the tokens
 
-<!-- Where a token id is found: the resolver `imports:` names, its sets (always applied) and its modifier (the contexts, and which is the default). How an id reaches code: `color.surface` is `bg-surface` and `var(--color-surface)`, `typography.body-md` is `text-body-md` (the whole style). The palette has no class. -->
+<!-- Where a token id is found: the resolver `imports:` names, its sets (always applied) and its modifier (the contexts, and which is the default). How an id reaches code: `colors.surface` is `bg-surface` and `var(--color-surface)`, `typography.body-md` is `text-body-md` (the whole style). The palette has no class. -->
 
 ## Colors
 

@@ -90,6 +90,12 @@ describe("reportWarnings", () => {
     assert.deepEqual(reportProblems(report), []);
   });
 
+  it("warns about a listed package whose latest version was not checked", () => {
+    const report = sampleReport();
+    report.stack.versions.eslint = { installed: "9.39.4" };
+    assert.deepEqual(reportWarnings(report), ["stack.versions.eslint has no latest; check it in the registry (references/sources.md), or leave the package out"]);
+  });
+
   it("stays quiet for one sentence, even with inner punctuation", () => {
     const report = sampleReport();
     report.parts[0].summary = "Roles use purpose names in kebab-case (surface, on-surface), and ids map to classes.";
@@ -121,6 +127,22 @@ describe("renderReport", () => {
     const rendered = renderReport(report);
     assert.match(rendered, /- Project: fixture-app \(`abc1234`\), with uncommitted changes/);
     assert.match(rendered, /- Previously: `tiers\/role-aliases-palette@DESIGN\.md#colors`/);
+  });
+
+  it("names the profile the gates target when none was detected, and refuses one beside a detected profile", () => {
+    const report = sampleReport();
+    report.stack.profile = null;
+    report.stack.targetProfile = "terrazzo-tailwind-v4";
+    assert.deepEqual(reportProblems(report), []);
+    assert.match(renderReport(report), /- Profile: none detected; the recommended gates target terrazzo-tailwind-v4/);
+    delete report.stack.targetProfile;
+    assert.match(renderReport(report), /- Profile: none \(core rules only\)/);
+    const both = sampleReport();
+    both.stack.targetProfile = "terrazzo-tailwind-v4";
+    const unknown = sampleReport();
+    unknown.stack.profile = null;
+    unknown.stack.targetProfile = "shadcn";
+    for (const bad of [both, unknown]) assert.match(reportProblems(bad)[0], /^stack\.targetProfile is "(terrazzo-tailwind-v4|shadcn)": it names one of terrazzo-tailwind-v4, and only when stack\.profile is null$/);
   });
 
   it("escapes a pipe inside a table cell", () => {

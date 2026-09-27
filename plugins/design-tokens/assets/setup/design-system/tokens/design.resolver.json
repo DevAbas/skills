@@ -10,7 +10,7 @@
     },
     "semantic": {
       "description": "Roles and styles.",
-      "sources": [{ "$ref": "semantic/color.tokens.json" }, { "$ref": "semantic/typography.tokens.json" }, { "$ref": "semantic/spacing.tokens.json" }, { "$ref": "semantic/rounded.tokens.json" }]
+      "sources": [{ "$ref": "semantic/colors.tokens.json" }, { "$ref": "semantic/typography.tokens.json" }, { "$ref": "semantic/spacing.tokens.json" }, { "$ref": "semantic/rounded.tokens.json" }]
     }
   },
   "resolutionOrder": [{ "$ref": "#/sets/foundation" }, { "$ref": "#/sets/semantic" }]

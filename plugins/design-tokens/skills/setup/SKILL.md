@@ -74,7 +74,7 @@ Present the plan and wait for approval. Use plan mode when the session offers it
 **Token files.** Exactly the canonical layout, `design-system/tokens/` (`${CLAUDE_PLUGIN_ROOT}/references/conventions.md`), started from `${CLAUDE_PLUGIN_ROOT}/assets/setup/design-system/tokens/`:
 - **The resolver.** `design.resolver.json` for one context (sets only), or `design.resolver.themes.json`, saved as `design.resolver.json`, for two or more (a `theme` modifier);
 - **Foundation.** `foundation/palette.tokens.json`, with the generator and seeds in `$extensions` under the project's own reverse-domain key, and `foundation/font.tokens.json`;
-- **Semantic.** `semantic/typography`, `spacing` and `rounded`, plus `semantic/color.tokens.json` for one context;
+- **Semantic.** `semantic/typography`, `spacing` and `rounded`, plus `semantic/colors.tokens.json` for one context;
 - **Themes.** `themes/<context>.tokens.json`, one per context, only for two or more.
 
 The group names are the canonical ones, so the checks need no configuration.

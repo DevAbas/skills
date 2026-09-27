@@ -76,7 +76,7 @@ Present the plan and wait for approval. Use plan mode when the session offers it
 
 **Measure first.** When something looks wrong, measure it before explaining it: element rects, text ranges (`Range.getBoundingClientRect`), computed styles, in the committed code and in the change. A fix that changes an approach cites the standard it rests on (the spec, MDN, the tool's documentation for the installed version), not a hypothesis.
 
-**Names and paths.** A batch that moves a project to the canonical layout or names (`${CLAUDE_PLUGIN_ROOT}/references/conventions.md`) renames token ids, the rules document's contract and the code that reads them. Propose it as its own batch; never fold it into another.
+**Names and paths.** A batch that moves a project to the canonical layout or names follows `${CLAUDE_PLUGIN_ROOT}/references/conventions.md`, Moving to the canonical layout: its steps, and its proof (the rebuilt output differs in comments only, and `check-tokens` reports the same problems). A rename changes token ids, the rules document's contract and the code that reads them. Propose it as its own batch; never fold it into another, and never add a missing tier in it.
 
 ## Step 3: Implement
 

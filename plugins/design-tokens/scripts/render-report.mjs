@@ -14,6 +14,8 @@ import { pathToFileURL } from "node:url";
 
 export const PARTS = ["naming", "tiers", "format", "docs"];
 const STATUSES = ["met", "partial", "missing"];
+/** The profiles a report may name (references/profiles). */
+const PROFILES = ["terrazzo-tailwind-v4"];
 const SEVERITIES = ["error", "warning", "info"];
 const RUNS = ["agent-edit", "agent-commit", "commit", "ci"];
 const GATE_STATUSES = ["present", "partial", "missing"];
@@ -37,6 +39,7 @@ export function reportProblems(report) {
   if (r.project?.dirty !== undefined && typeof r.project.dirty !== "boolean") problems.push("project.dirty must be true or false");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(r.date ?? ""))) problems.push("date is not an ISO date (YYYY-MM-DD)");
   if (!r.stack || typeof r.stack !== "object" || !("profile" in r.stack)) problems.push("stack.profile is missing (null when no profile applies)");
+  else if (r.stack.targetProfile !== undefined && (r.stack.profile !== null || !PROFILES.includes(r.stack.targetProfile))) problems.push(`stack.targetProfile is ${JSON.stringify(r.stack.targetProfile)}: it names one of ${PROFILES.join(", ")}, and only when stack.profile is null`);
 
   if (!Array.isArray(r.parts)) problems.push("parts is not a list");
   else {
@@ -106,9 +109,13 @@ export function reportProblems(report) {
  * @returns {string[]}
  */
 export function reportWarnings(report) {
-  return report.parts
+  const sentences = report.parts
     .filter((part) => (part.summary.match(/[.!?]\s+(?=[A-Z`])/g) ?? []).length > 0)
     .map((part) => `parts.${part.id}.summary has more than one sentence; keep one, and move the detail into findings`);
+  const unchecked = Object.entries(report.stack?.versions ?? {})
+    .filter(([, version]) => !version?.latest)
+    .map(([name]) => `stack.versions.${name} has no latest; check it in the registry (references/sources.md), or leave the package out`);
+  return [...sentences, ...unchecked];
 }
 
 const SEVERITY_ORDER = Object.fromEntries(SEVERITIES.map((severity, index) => [severity, index]));
@@ -126,7 +133,7 @@ export function renderReport(report) {
   lines.push("# Design Token Architecture Audit", "");
   lines.push(`- Project: ${project.name}${project.commit ? ` (${code(project.commit)})` : ""}${project.dirty ? ", with uncommitted changes" : ""}`);
   lines.push(`- Date: ${report.date}`);
-  lines.push(`- Profile: ${stack.profile ?? "none (core rules only)"}`);
+  lines.push(`- Profile: ${stack.profile ?? (stack.targetProfile ? `none detected; the recommended gates target ${stack.targetProfile}` : "none (core rules only)")}`);
   if (stack.tokenFormat) lines.push(`- Token format: ${stack.tokenFormat}`);
   if (stack.rulesDocument) lines.push(`- Rules document: ${code(stack.rulesDocument)}`);
   lines.push("");

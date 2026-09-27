@@ -46,6 +46,7 @@ The only profile today. It assumes **Tailwind CSS v4**, and builds the Tailwind 
 | Package | Why | License | Tested with |
 |---|---|---|---|
 | `@terrazzo/cli`, `@terrazzo/parser`, `@terrazzo/plugin-css`, `@terrazzo/plugin-tailwind` | Build the CSS and the Tailwind theme from the tokens, and lint the token files | MIT | 2.7.1 |
+| `@terrazzo/plugin-js` | Optional: resolved values for server code that cannot read CSS variables (OG images, metadata) | MIT | 2.7.1 |
 | `yaml` | Read `DESIGN.md`'s front matter in the contract check | ISC | 2.9.1 |
 | ESLint (flat config) | Run the `token-classes` and `no-raw-color` rules. The project's own ESLint is used | MIT | 9.39. ESLint 10 is not tested yet |
 | `@google/design.md` | Optional: lint `DESIGN.md` and its contrast pairs | Apache-2.0 | 0.4.0 |
@@ -77,6 +78,17 @@ The only profile today. It assumes **Tailwind CSS v4**, and builds the Tailwind 
 The audit runs its analysis in a read-only subagent, `design-tokens:token-auditor`.
 
 While a skill of this plugin is in use, a hook keeps its searches inside the project, the plugin and the session scratchpad. A search of the whole disk (`find /`, `rg ~`, a Glob at `/`) is blocked with the reason, so the agent reads a tool's output location from its config instead. This also avoids macOS access prompts for folders such as Downloads and Desktop. Sessions that never invoke the plugin's skills are not affected.
+
+### The hooks `harness` installs
+
+| Hook | When | What it can do |
+|---|---|---|
+| `protect-generated` | Before an Edit or Write | Denies an edit to a generated output |
+| `check-on-edit` | After an Edit or Write | Lints the file, or runs the token checks after a token or rules edit, and reports a failure to the agent |
+| `check-after-bash` | After a Bash command | The same checks on the files the command changed, from Claude Code's changed-file list (v2.1.269 or later; in modes other than auto, only when your own settings set `bashEditDiffEnabled`) |
+| `guard-commit` | Before an agent's `git commit` | Runs the commit gates and refuses the commit when one fails |
+
+A hook that runs after the tool reports; it cannot undo the write. The commit gates, for an agent, a person and CI, are what enforce.
 
 ## The rubric
 

@@ -17,9 +17,9 @@ function contexts() {
   const palette = { "palette.gray-1": color("#fcfcfc"), "palette.accent-9": color("#00aa88") };
   const context = (surfaceHex) => ({
     ...palette,
-    "color.surface": color(surfaceHex, { aliasOf: "palette.gray-1", aliasChain: ["palette.gray-1"] }),
-    "color.primary": color("#00aa88", { aliasOf: "palette.accent-9", aliasChain: ["palette.accent-9"] }),
-    "color.primary-hover": derived("#008866", hoverRule),
+    "colors.surface": color(surfaceHex, { aliasOf: "palette.gray-1", aliasChain: ["palette.gray-1"] }),
+    "colors.primary": color("#00aa88", { aliasOf: "palette.accent-9", aliasChain: ["palette.accent-9"] }),
+    "colors.primary-hover": derived("#008866", hoverRule),
     "typography.body": { $type: "typography", originalValue: { $value: { fontFamily: "{font.sans}", fontWeight: "{font.weight.400}" } } },
   });
   return { light: context("#fcfcfc"), dark: context("#111111") };
@@ -47,29 +47,29 @@ describe("tierProblems", () => {
   it("refuses a palette alias, a role pointing to a role, and a literal role", () => {
     const tokens = contexts();
     tokens.light["palette.gray-1"] = color("#fcfcfc", { aliasOf: "palette.accent-9", aliasChain: ["palette.accent-9"] });
-    tokens.dark["color.surface"] = color("#00aa88", { aliasOf: "palette.accent-9", aliasChain: ["color.primary", "palette.accent-9"] });
-    tokens.dark["color.primary"] = color("#00aa88");
+    tokens.dark["colors.surface"] = color("#00aa88", { aliasOf: "palette.accent-9", aliasChain: ["colors.primary", "palette.accent-9"] });
+    tokens.dark["colors.primary"] = color("#00aa88");
     assert.deepEqual(tierProblems(tokens, settings, derive), [
       "tiers/palette-literal: palette.gray-1 is an alias of palette.accent-9; the palette holds values only",
-      "tiers/role-aliases-palette: dark: color.surface points to color.primary; a role points to the palette, or is derived by a recorded rule",
-      "tiers/role-aliases-palette: dark: color.primary is a literal; a role points to the palette, or is derived by a recorded rule",
+      "tiers/role-aliases-palette: dark: colors.surface points to colors.primary; a role points to the palette, or is derived by a recorded rule",
+      "tiers/role-aliases-palette: dark: colors.primary is a literal; a role points to the palette, or is derived by a recorded rule",
     ]);
   });
 
   it("refuses a derived value its rule does not give, and a rule reading a missing role", () => {
     const tokens = contexts();
-    tokens.light["color.primary-hover"] = derived("#123456", hoverRule);
-    tokens.dark["color.primary-hover"] = derived("#008866", { kind: "mix", from: "primary", weight: 0.5, over: "missing" });
+    tokens.light["colors.primary-hover"] = derived("#123456", hoverRule);
+    tokens.dark["colors.primary-hover"] = derived("#008866", { kind: "mix", from: "primary", weight: 0.5, over: "missing" });
     const problems = tierProblems(tokens, settings, derive);
-    assert.ok(problems.includes("tiers/derived-rule-recorded: light: color.primary-hover is #123456, but its rule gives #008866"));
-    assert.ok(problems.includes("tiers/derived-rule-recorded: dark: color.primary-hover derives from missing, which is not a role"));
-    assert.ok(problems.includes("format/themes-complete: color.primary-hover is derived differently across light, dark"));
+    assert.ok(problems.includes("tiers/derived-rule-recorded: light: colors.primary-hover is #123456, but its rule gives #008866"));
+    assert.ok(problems.includes("tiers/derived-rule-recorded: dark: colors.primary-hover derives from missing, which is not a role"));
+    assert.ok(problems.includes("format/themes-complete: colors.primary-hover is derived differently across light, dark"));
   });
 
   it("refuses a role missing from one context", () => {
     const tokens = contexts();
-    delete tokens.dark["color.surface"];
-    assert.deepEqual(tierProblems(tokens, settings, derive), ["format/themes-complete: color.surface is defined in light only"]);
+    delete tokens.dark["colors.surface"];
+    assert.deepEqual(tierProblems(tokens, settings, derive), ["format/themes-complete: colors.surface is defined in light only"]);
   });
 
   it("refuses a text style with a literal family or weight", () => {
@@ -89,7 +89,7 @@ describe("readProjectTokens", () => {
     return root;
   };
   const palette = { palette: { $type: "color", "gray-1": { $value: { colorSpace: "srgb", components: [0.99, 0.99, 0.99], hex: "#fcfcfc" } }, "gray-12": { $value: { colorSpace: "srgb", components: [0.07, 0.07, 0.07], hex: "#111111" } } } };
-  const theme = (surface) => ({ color: { $type: "color", surface: { $value: `{palette.${surface}}` } } });
+  const theme = (surface) => ({ colors: { $type: "color", surface: { $value: `{palette.${surface}}` } } });
 
   it("resolves each context of the theme modifier, and the tier rules pass on them", () => {
     const root = write({
@@ -102,7 +102,7 @@ describe("readProjectTokens", () => {
       const { contexts, problems } = readProjectTokens(root, settings);
       assert.deepEqual(problems, []);
       assert.deepEqual(Object.keys(contexts), ["light", "dark"]);
-      assert.deepEqual(contexts.dark["color.surface"].aliasChain, ["palette.gray-12"]);
+      assert.deepEqual(contexts.dark["colors.surface"].aliasChain, ["palette.gray-12"]);
       assert.deepEqual(tierProblems(contexts, settings), []);
     } finally {
       rmSync(root, { recursive: true, force: true });
@@ -138,10 +138,10 @@ describe("groupProblems: no silent pass", () => {
   const color = { $type: "color", $value: { hex: "#111111" } };
 
   it("names the groups the tokens have when the roles group is empty", () => {
-    const { problems, counts } = groupProblems(ctx({ "colors.surface": color, "typography.body": { $type: "typography" } }), settings);
+    const { problems, counts } = groupProblems(ctx({ "color.surface": color, "typography.body": { $type: "typography" } }), settings);
     assert.deepEqual(counts, { palette: 0, roles: 0, styles: 1 });
     assert.equal(problems.length, 1);
-    assert.match(problems[0], /^config: no tokens in the roles group color, so no role could be checked; the tokens have colors, typography\. Pass --roles <group>/);
+    assert.match(problems[0], /^config: no tokens in the roles group colors, so no role could be checked; the tokens have color, typography\. Pass --roles <group>/);
   });
 
   it("reports a missing palette as a tier problem once roles exist", () => {

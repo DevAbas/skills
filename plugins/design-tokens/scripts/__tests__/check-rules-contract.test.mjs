@@ -3,12 +3,12 @@ import { describe, it } from "node:test";
 import { contractProblems, frontMatterText } from "../check-rules-contract.mjs";
 import { TOKEN_DEFAULTS } from "../lib/project-modules.mjs";
 
-const tokenIds = new Set(["color.surface", "color.on-surface", "typography.body-md", "rounded.md", "palette.gray-1"]);
+const tokenIds = new Set(["colors.surface", "colors.on-surface", "typography.body-md", "rounded.md", "palette.gray-1"]);
 const valid = {
   version: "alpha",
   name: "App",
   imports: "./design-system/tokens/design.resolver.json",
-  components: { page: { backgroundColor: "{color.surface}", textColor: "{color.on-surface}", typography: "{typography.body-md}", rounded: "{rounded.md}" } },
+  components: { page: { backgroundColor: "{colors.surface}", textColor: "{colors.on-surface}", typography: "{typography.body-md}", rounded: "{rounded.md}" } },
 };
 
 describe("frontMatterText", () => {
@@ -37,7 +37,7 @@ describe("contractProblems", () => {
       'tiers/components-read-roles: components.card.backgroundColor is "#ffffff"; a component names a token ({group.name}), it does not state a value',
       "tiers/components-read-roles: components.card.textColor reads the palette entry gray-1; components read roles",
       "docs/rules-reference-existing-tokens: components.card.typography names {typography.huge}, which the tokens do not define",
-      "tiers/components-read-roles: components.card.rounded reads spacing.*; a component reads color, typography, rounded",
+      "tiers/components-read-roles: components.card.rounded reads spacing.*; a component reads colors, typography, rounded",
     ]);
   });
 });

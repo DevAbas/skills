@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { editedFile, gatesProblems, globToRegExp, isGitCommit, matchesAny } from "../gates.mjs";
+import { bashChangedFiles, editProblems, editedFile, gatesProblems, globToRegExp, isGitCommit, matchesAny } from "../gates.mjs";
 
 describe("globToRegExp", () => {
   it("lets ** span folders, including none", () => {
@@ -49,7 +49,7 @@ describe("gatesProblems", () => {
   it("refuses wrong shapes, and sources that run nothing", () => {
     assert.deepEqual(gatesProblems({ generated: "a.css", lint: { files: ["x"] }, sources: ["tokens/**"] }), [
       "generated must be a list of non-empty strings",
-      "lint needs files (globs) and command (the linter, which receives the edited file as its last argument)",
+      "lint needs files (globs) and command (the linter, which receives the edited files as its last arguments)",
       "sources is set but onSourceEdit runs nothing",
     ]);
     assert.deepEqual(gatesProblems(null), ["design-system/gates.json is not a JSON object"]);
@@ -60,5 +60,59 @@ describe("editedFile", () => {
   it("makes the tool's path relative to the root", () => {
     assert.equal(editedFile({ tool_input: { file_path: "/repo/src/a.tsx" } }, "/repo"), "src/a.tsx");
     assert.equal(editedFile({ tool_input: {} }, "/repo"), undefined);
+  });
+});
+
+describe("bashChangedFiles", () => {
+  const input = (bashEditDiff) => ({ tool_name: "Bash", tool_input: { command: "sed -i '' s/a/b/ src/a.tsx" }, tool_response: { stdout: "", bashEditDiff } });
+
+  it("reads Claude Code's changed-file list relative to the root, once each", () => {
+    assert.deepEqual(bashChangedFiles(input({ changedFiles: ["/repo/src/a.tsx", "/repo/DESIGN.md", "/repo/src/a.tsx"], files: [], moreFiles: 0 }), "/repo"), ["src/a.tsx", "DESIGN.md"]);
+  });
+
+  it("gives nothing without a list, for a skipped diff, or for a path outside the root", () => {
+    assert.deepEqual(bashChangedFiles({ tool_response: { stdout: "" } }, "/repo"), []);
+    assert.deepEqual(bashChangedFiles(input({ skipped: true, changedFiles: ["/repo/src/a.tsx"] }), "/repo"), []);
+    assert.deepEqual(bashChangedFiles(input({ changedFiles: ["/elsewhere/x.tsx", "/repo", 7, ""] }), "/repo"), []);
+    assert.deepEqual(bashChangedFiles({}, "/repo"), []);
+  });
+});
+
+describe("editProblems", () => {
+  const gates = { lint: { files: ["src/**/*.tsx"], command: "eslint", strictEnv: { DESIGN_LINT_STRICT: "1" } }, sources: ["design-system/tokens/**/*.json", "DESIGN.md"], onSourceEdit: ["tokens:build", "tokens:check"] };
+  const recorder = ({ lintStatus = 0, failing } = {}) => {
+    const calls = [];
+    return {
+      calls,
+      options: {
+        root: "/repo",
+        exists: (file) => file !== "src/deleted.tsx",
+        runCommand: (command, env) => (calls.push({ command, env }), { status: lintStatus, output: "1:1 error design/no-raw-color" }),
+        runCommands: (commands) => (calls.push({ commands }), failing ? { command: failing, output: "3 problems" } : undefined),
+      },
+    };
+  };
+
+  it("lints the files in lint.files that still exist, in one call with the strict environment", () => {
+    const { calls, options } = recorder();
+    assert.equal(editProblems(["src/a.tsx", "src/b.tsx", "src/deleted.tsx", "README.md"], gates, options), undefined);
+    assert.deepEqual(calls, [{ command: 'eslint "src/a.tsx" "src/b.tsx"', env: { DESIGN_LINT_STRICT: "1" } }]);
+  });
+
+  it("runs onSourceEdit once however many sources changed", () => {
+    const { calls, options } = recorder();
+    editProblems(["DESIGN.md", "design-system/tokens/semantic/colors.tokens.json"], gates, options);
+    assert.deepEqual(calls, [{ commands: ["tokens:build", "tokens:check"] }]);
+  });
+
+  it("returns the lint failure, and the source failure, as the message the agent reads", () => {
+    assert.match(editProblems(["src/a.tsx"], gates, recorder({ lintStatus: 1 }).options), /^The design lint failed for src\/a\.tsx:\n1:1 error design\/no-raw-color/);
+    assert.match(editProblems(["DESIGN.md"], gates, recorder({ failing: "tokens:check" }).options), /^After editing DESIGN\.md, `tokens:check` failed:\n3 problems/);
+  });
+
+  it("runs nothing for files no gate covers", () => {
+    const { calls, options } = recorder();
+    assert.equal(editProblems(["README.md", "src/deleted.tsx"], gates, options), undefined);
+    assert.deepEqual(calls, []);
   });
 });

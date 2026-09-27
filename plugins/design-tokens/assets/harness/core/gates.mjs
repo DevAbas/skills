@@ -1,16 +1,17 @@
 // What the design-token gates share: the project's gates config
 // (design-system/gates.json; design-tokens.gates.json at the root before 0.4.0),
-// glob matching, the hook's
-// JSON input, and running a command. Copied into a project by
-// /design-tokens:harness; the config, not this file, is what a project edits.
+// glob matching, the hook's JSON input, the checks an edited file gets, and
+// running a command. Copied into a project by /design-tokens:harness; the
+// config, not this file, is what a project edits.
 //
 // Claude Code hooks read exit code 2 as "blocked", and feed stderr back to the
-// agent (https://code.claude.com/docs/en/hooks). No dependencies, Node 20 or
-// later.
+// agent (https://code.claude.com/docs/en/hooks). A PreToolUse block stops the
+// tool call; a PostToolUse one comes after the tool ran, so it reports and the
+// commit gate is what enforces. No dependencies, Node 20 or later.
 
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 
 export const CONFIG_FILES = ["design-system/gates.json", "design-tokens.gates.json"];
 export const CONFIG_FILE = CONFIG_FILES[0];
@@ -71,7 +72,7 @@ export function gatesProblems(config) {
   };
   for (const key of ["generated", "sources", "onSourceEdit", "beforeCommit"]) list(key);
   if (c.lint !== undefined) {
-    if (!Array.isArray(c.lint?.files) || typeof c.lint?.command !== "string") problems.push("lint needs files (globs) and command (the linter, which receives the edited file as its last argument)");
+    if (!Array.isArray(c.lint?.files) || typeof c.lint?.command !== "string") problems.push("lint needs files (globs) and command (the linter, which receives the edited files as its last arguments)");
     if (c.lint?.strictEnv !== undefined && (typeof c.lint.strictEnv !== "object" || Object.values(c.lint.strictEnv).some((value) => typeof value !== "string"))) problems.push("lint.strictEnv must map variable names to strings");
   }
   if ((c.sources?.length ?? 0) > 0 && (c.onSourceEdit?.length ?? 0) === 0) problems.push("sources is set but onSourceEdit runs nothing");
@@ -94,11 +95,51 @@ export function hookInput() {
   return raw ? JSON.parse(raw) : {};
 }
 
+/** `file` relative to `root`, forward slashes; undefined when it is outside the root. */
+function projectPath(file, root) {
+  const path = relative(root, resolve(root, file)).split("\\").join("/");
+  return path && path !== ".." && !path.startsWith("../") && !isAbsolute(path) ? path : undefined;
+}
+
 /** The edited file relative to `root`, forward slashes; undefined when the tool call has none. */
 export function editedFile(input, root = process.cwd()) {
   const file = input?.tool_input?.file_path;
   if (typeof file !== "string" || !file) return undefined;
   return relative(root, resolve(root, file)).split("\\").join("/");
+}
+
+/**
+ * The files a Bash command changed, relative to `root`: Claude Code's `tool_response.bashEditDiff.changedFiles`
+ * (https://code.claude.com/docs/en/hooks, Bash; v2.1.269 or later, public beta). Empty when the input has no
+ * diff (recording is off, or the command ran in the background) or the diff was skipped (a command that moves
+ * the working tree, such as `git checkout`). Files outside the root are left out.
+ */
+export function bashChangedFiles(input, root = process.cwd()) {
+  const diff = input?.tool_response?.bashEditDiff;
+  if (!diff || diff.skipped || !Array.isArray(diff.changedFiles)) return [];
+  const files = diff.changedFiles.filter((file) => typeof file === "string" && file).map((file) => projectPath(file, root));
+  return [...new Set(files.filter((file) => file !== undefined))];
+}
+
+/**
+ * The checks an edited file gets, for one file or many: the files in `lint.files` that still exist are linted in
+ * one `lint.command` call (the files are its last arguments), and `onSourceEdit` runs once when any file is in
+ * `sources`. The first failure as the message the agent reads, or undefined when every check passes.
+ * @param {string[]} files relative to the root
+ * @param {Record<string, any>} gates
+ */
+export function editProblems(files, gates, { root = process.cwd(), exists = (file) => existsSync(join(root, file)), runCommand = run, runCommands = runAll } = {}) {
+  const lintable = gates.lint ? files.filter((file) => matchesAny(file, gates.lint.files) && exists(file)) : [];
+  if (lintable.length > 0) {
+    const result = runCommand(`${gates.lint.command} ${lintable.map((file) => JSON.stringify(file)).join(" ")}`, gates.lint.strictEnv ?? {}, root);
+    if (result.status !== 0) return `The design lint failed for ${lintable.join(", ")}:\n${result.output}`;
+  }
+  const source = files.find((file) => matchesAny(file, gates.sources));
+  if (source !== undefined) {
+    const failure = runCommands(gates.onSourceEdit, {}, root);
+    if (failure) return `After editing ${source}, \`${failure.command}\` failed:\n${failure.output}\nValues live in the token files; rebuild the outputs instead of editing them.`;
+  }
+  return undefined;
 }
 
 /** Runs a shell command at `root`, the project's node_modules/.bin first on PATH. */

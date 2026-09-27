@@ -7,6 +7,24 @@ A version bump means:
 - **Minor:** a new rule, gate, profile or skill.
 - **Patch:** a fix or a clarification.
 
+## 0.5.0
+
+What the first harness on a real project and the second audit taught.
+
+- **The roles group is `colors`.** The rules document is written in the design.md format, whose front matter has fixed sections (`colors`, `typography`, `rounded`, `spacing`, `components`), and the contract check requires a contract id to be a token id. 0.4.0's `color` would have broken the design.md lint of a project that composes its front matter from the tokens. `setup`, the checks' defaults and the Terrazzo template now use `colors`; `palette`, `font` and `shadow` keep their names (`references/conventions.md`).
+- **Moving to the canonical layout** is a written procedure with its proof: the rebuilt output differs in comment lines only, and `check-tokens` reports the same problems before and after (`references/conventions.md`). `fix` follows it; `harness` says in one line when a project differs, and never moves files itself.
+- **Edits through Bash are checked.** The new `check-after-bash` hook (PostToolUse, Bash) gives the files a command changed the same checks as an Edit or Write, from Claude Code's `tool_response.bashEditDiff` (v2.1.269 or later). `check-on-edit` and it share `editProblems` in `gates.mjs`. The harness skill says which hooks prevent (PreToolUse) and which report after the write (PostToolUse), and asks for the proof in a live session.
+- **Report.** An optional `stack.targetProfile` names the profile the recommended gates use when none was detected, so the header no longer says "none" beside Terrazzo gates. A listed package without its latest version is a warning; the auditor reads every listed package's latest from the registry. The schema stays 1.
+- **Hand copies of token values.** The profile's recipe: server code imports resolved values from `@terrazzo/plugin-js` (verified beside plugin-css and plugin-tailwind: the CSS outputs unchanged, 162 colour values in two contexts equal to `check-tokens`'s own), and client code that follows the theme reads the variable at runtime.
+- **Fixes.**
+  - `dtcg.mjs` no longer binds an unused `$extends`, which a project's ESLint reported as a warning.
+  - The example `gates.json` names the canonical paths (`design-system/tokens/**`, `design-system/theme.template.css`), missed in 0.4.0.
+
+**Migrating from 0.4.0**
+- A project whose roles group is `color`: set `tokens.roles` and `tokens.readable` in `design-system/gates.json`, or move with the procedure above.
+- Copy `check-after-bash.mjs` and the new `gates.mjs` to `.claude/hooks/design-tokens/`, and merge the `PostToolUse` `Bash` entry of `assets/harness/core/settings.hooks.json`.
+- Copy the new `checks/lib/dtcg.mjs` to `design-system/checks/lib/`.
+
 ## 0.4.0
 
 A canonical layout, and the lessons from the first migration of a real project.

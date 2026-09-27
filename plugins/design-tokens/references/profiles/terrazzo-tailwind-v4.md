@@ -31,7 +31,7 @@ A project with other paths records them once, in `design-system/gates.json`, and
 
   | Token group | Tailwind namespace |
   |---|---|
-  | `color.*` | `color` |
+  | `colors.*` | `color` |
   | `typography.*` | `text` |
   | `rounded.*` | `radius` |
   | `spacing.*` | `spacing` |
@@ -42,6 +42,7 @@ A project with other paths records them once, in `design-system/gates.json`, and
 - **Typography composites** become `--text-<style>` with `--text-<style>--line-height`, `--letter-spacing` and `--font-weight`. One class (`text-body-md`) applies the whole style. A documented borrow reads the other style's part: `leading-(--text-label-lg--line-height)`.
 - **Dark (or any second context)** is a `@custom-variant` in the template, `@variant <name> { @tz (theme: "<name>"); }`. Confirm the variant syntax in Tailwind's dark mode docs.
 - **An output directory override** (`DESIGN_TOKENS_OUT_DIR`) lets the staleness check build into a temporary folder.
+- **Resolved values for code that cannot read CSS variables** (Pitfalls, Hand copies): `@terrazzo/plugin-js` in the same `plugins` list, `js({ filename: "tokens.js" })` (https://terrazzo.app/docs/integrations/js). It writes `tokens.js` and `tokens.d.ts` and leaves the CSS outputs as they were. Its `contexts` option limits the permutations it builds, `properties` the fields.
 
 ## Checks and gates per rule
 
@@ -72,6 +73,7 @@ The ESLint rules join the project's flat config twice, once in each severity (`d
 
 Ask before adding each one:
 - `@terrazzo/cli`, `@terrazzo/parser`, `@terrazzo/plugin-css`, `@terrazzo/plugin-tailwind`, for the build (the config imports `RECOMMENDED_CONFIG` from `@terrazzo/parser`);
+- `@terrazzo/plugin-js`, only when server code needs resolved values (Pitfalls, Hand copies);
 - `yaml`, which the contract check uses to read the front matter;
 - `@google/design.md`, only when the project wants its contrast and structure lint.
 
@@ -99,3 +101,7 @@ Found while migrating a real project, and confirmed in Terrazzo 2.7.1. Re-check 
   - Wire the family separately: a `font-*` utility from the `font` group, or the framework's font loader (Next.js `next/font`).
   - Gate that the loaded family matches `font.family.*`, so a change to the token is not silently ignored.
 - **Measure before you blame a token.** A visual problem after a token change is measured first (element rects, text ranges, computed styles, before and after). Text that is centred by its box but looks off-centre is optical: the box includes the font's ascent and descent, and `text-box: trim-both cap alphabetic` (CSS Inline 3) is the standard remedy. It is a design decision, not a token fix.
+- **Hand copies of token values.** Some code needs a value, not a CSS variable: `ImageResponse` (OG images), `metadata.themeColor`, WebGL uniforms, a Mermaid theme. A hand copy of the value is a second source that drifts (`tiers/no-literal-in-code`). Two answers, by where the code runs:
+  - *Server code* (`ImageResponse`, metadata) imports the values the build generated. `@terrazzo/plugin-js` writes `tokens.js`, whose `resolver.apply({ theme: "dark" })["colors.surface"].$value` is one context's resolved value (with `hex` for a colour). The module has no runtime imports; its `.d.ts` imports types from `@terrazzo/token-types`. List it in `generated`, so the hooks deny an edit and the staleness check covers it. The docs call it heavy and meant for server rendering, so keep it out of client bundles.
+  - *Client code that follows the active theme* (WebGL, Mermaid) reads the role at runtime: `getComputedStyle(document.documentElement).getPropertyValue("--color-<role>")`, converted where the API needs numbers, and read again when the theme changes. It reads the Tailwind variable, so it runs after the stylesheet has loaded.
+  - *Verified* with plugin-js 2.7.1 beside plugin-css and plugin-tailwind in one config, on a two-context token set: the CSS outputs were byte-identical to the build without it, and all 162 colour values in both contexts matched `check-tokens.mjs`'s own resolution.

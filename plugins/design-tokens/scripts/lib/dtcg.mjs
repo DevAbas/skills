@@ -214,7 +214,8 @@ function extendGroups(tree, problems) {
       if (!target) problems.push(`${id || "(root)"}.$extends names ${JSON.stringify(node.$extends)}, which is not a group (Format §6.4)`);
       else if (stack.includes(target.id)) problems.push(`circular $extends: ${[...stack, target.id].join(" → ")} (Format §6.4.4)`);
       else {
-        const { $extends, ...local } = node;
+        const local = { ...node };
+        delete local.$extends;
         result = mergeTokens(visit(target.node, target.id, [...stack, target.id]), local);
       }
     }

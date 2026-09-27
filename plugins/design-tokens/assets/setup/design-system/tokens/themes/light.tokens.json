@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
   "$description": "light: every colour role, each an alias into the palette or derived by a recorded rule. Every context defines the same roles.",
-  "color": {
+  "colors": {
     "$type": "color"
   }
 }

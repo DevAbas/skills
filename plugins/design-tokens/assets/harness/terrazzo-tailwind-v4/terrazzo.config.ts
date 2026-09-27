@@ -48,7 +48,7 @@ export default defineConfig({
       template: resolve("design-system/theme.template.css"),
       filename: "theme.generated.css",
       theme: {
-        color: ["color.*"],
+        color: ["colors.*"],
         text: ["typography.*"],
         radius: ["rounded.*"],
         spacing: ["spacing.*"],

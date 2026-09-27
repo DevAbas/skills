@@ -66,7 +66,7 @@ Each rule block has five fields:
 
 ### `naming/one-name-everywhere`
 
-- **What:** a token keeps one name in the tokens, the rules document and the code, mapped by one documented rule (`color.surface` → `bg-surface` / `var(--color-surface)`).
+- **What:** a token keeps one name in the tokens, the rules document and the code, mapped by one documented rule (`colors.surface` → `bg-surface` / `var(--color-surface)`).
 - **Why:** decisions, Naming.
 - **Check (core):**
   - compare the ids the rules document cites, the ids in the token files, and the names code uses (CSS variables, utility classes);
@@ -145,7 +145,7 @@ Each rule block has five fields:
 
 ### `tiers/components-read-roles`
 
-- **What:** the component contract names roles only (`{color.*}`, `{typography.*}`, `{rounded.*}`), never palette entries or values.
+- **What:** the component contract names roles only (`{colors.*}`, `{typography.*}`, `{rounded.*}`), never palette entries or values.
 - **Why:** principles 2.
 - **Check (core):** read the contract in the rules document's front matter. Flag palette references, literal values, and missing components that code has.
 - **Gate:** rules-contract check (profile).

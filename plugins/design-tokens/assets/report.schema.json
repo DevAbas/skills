@@ -32,6 +32,7 @@
       "required": ["profile"],
       "properties": {
         "profile": { "enum": ["terrazzo-tailwind-v4", null] },
+        "targetProfile": { "enum": ["terrazzo-tailwind-v4"], "description": "The profile whose assets the recommended gates use, when profile is null" },
         "tokenFormat": { "type": ["string", "null"] },
         "styling": { "type": "array", "items": { "type": "string" } },
         "rulesDocument": { "type": ["string", "null"] },

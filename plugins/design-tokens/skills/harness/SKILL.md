@@ -81,6 +81,8 @@ Write `design-system/gates.json`, starting from `${CLAUDE_PLUGIN_ROOT}/assets/ha
 
 Every path and command in it is the project's own. None is copied from the example.
 
+**A project off the canonical layout.** When `tokens` differs from the canonical layout (other paths or group names), say so in one line of the final report. Name the optional move (`${CLAUDE_PLUGIN_ROOT}/references/conventions.md`, Moving to the canonical layout), and suggest it as its own `fix` batch after the harness commit. Harness records the project's layout and never moves files itself.
+
 ## Step 3: Checks
 
 **Token and rules checks (any stack, no dependencies).** Copy them from the plugin into `design-system/checks/` (`${CLAUDE_PLUGIN_ROOT}/references/conventions.md`), keeping their layout so the relative imports hold:
@@ -115,7 +117,10 @@ For a stack without a profile, the token and rules checks work as they are. Writ
 
 From `${CLAUDE_PLUGIN_ROOT}/assets/harness/core/`:
 
-1. **Hooks.** Copy `gates.mjs`, `protect-generated.mjs`, `check-on-edit.mjs`, `guard-commit.mjs`, `run-gates.mjs` and `with-node.sh` to `.claude/hooks/design-tokens/`. Make `with-node.sh` executable.
+1. **Hooks.** Copy `gates.mjs`, `protect-generated.mjs`, `check-on-edit.mjs`, `check-after-bash.mjs`, `guard-commit.mjs`, `run-gates.mjs` and `with-node.sh` to `.claude/hooks/design-tokens/`. Make `with-node.sh` executable. What each hook can do:
+   - `protect-generated` (PreToolUse, Edit and Write) denies an edit to a generated output before it happens.
+   - `check-on-edit` (PostToolUse, Edit and Write) and `check-after-bash` (PostToolUse, Bash) run after the file is written. They report the failure to the agent; they cannot undo the write. The commit gate is what enforces.
+   - `check-after-bash` reads the files a command changed from Claude Code's `tool_response.bashEditDiff` (v2.1.269 or later, public beta). Without a setting, Claude Code records it only in auto and bypassPermissions mode, and only when it directs the agent to edit through Bash; in every mode only when the person's own `~/.claude/settings.json` sets `"bashEditDiffEnabled": true`, which a project's settings cannot turn on (https://code.claude.com/docs/en/settings-reference). Tell the person this in one line; never edit their user settings. Without the list the hook passes, and the commit gate still holds.
 2. **Settings.** Merge `settings.hooks.json` into `.claude/settings.json`. Show the merged `hooks` object and wait for approval: settings change what runs on every edit.
 3. **Pre-commit.** Add `pre-commit` to the project's git hooks. If a pre-commit hook exists, add its last line to that hook instead. Ask before changing `core.hooksPath` or `package.json`.
 4. **CI (optional).** Copy `design-tokens.yml` to `.github/workflows/`, with the project's Node version and install command. Confirm the action versions in their documentation.
@@ -134,6 +139,8 @@ A gate that never failed is not yet a gate. For each installed gate:
 
 Report each gate as proven, with the command and both results. Leave no violation behind.
 
+A hook run by hand proves its script, not that Claude Code loads it. The hooks load from `.claude/settings.json` when a session starts, so after the commit ask the person to start a new session, approve the hooks, and ask the agent there for one violation per hook: an Edit with `bg-[#fff]`, the same through `sed`, and an Edit to a generated output. The transcript line of each hook firing is the proof.
+
 ## Step 6: Record
 
 - **Document.** Add the gates to the project's agent instructions (CLAUDE.md or AGENTS.md): what runs, when, and the one command to run them all (`node .claude/hooks/design-tokens/run-gates.mjs before-commit`).
@@ -146,6 +153,7 @@ Report each gate as proven, with the command and both results. Leave no violatio
 - **No weakening.** Never weaken an existing gate or lint rule to make a new one pass.
 - **Existing tools first.** Custom checks only where no tool has the rule.
 - **Prove before reporting.** Every gate is shown failing before it is reported as installed.
+- **Say what a hook can do.** A PreToolUse hook prevents; a PostToolUse hook reports after the write. Never describe an after-the-fact check as a block.
 
 ## Tone
 

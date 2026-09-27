@@ -144,7 +144,7 @@ Sources:
 ## The rules document
 
 **Choice:** `DESIGN.md` in the Google design.md format:
-- the front matter holds only the document's identity, an `imports:` path to the tokens (the resolver, or the token entry file), and the `components:` contract, where each property names a token id (`{color.primary}`);
+- the front matter holds only the document's identity, an `imports:` path to the tokens (the resolver, or the token entry file), and the `components:` contract, where each property names a token id (`{colors.primary}`);
 - the prose explains meaning, use and reasons, and cites token ids, never values.
 
 **Why:**
@@ -166,7 +166,7 @@ Sources:
 **Choice:**
 - Roles are named by purpose (`surface`, `on-surface`, `primary`, `outline`), the palette by scale (`gray-1` to `gray-12`).
 - One case convention everywhere, kebab-case unless the project has another.
-- The same id maps to code by one documented rule, for example `color.surface` becomes `bg-surface` and `var(--color-surface)`.
+- The same id maps to code by one documented rule, for example `colors.surface` becomes `bg-surface` and `var(--color-surface)`.
 
 **Why:** a name that encodes appearance (`blue-button`) breaks the day the colour changes. A name that changes between the tokens, the rules and the code has to be translated by every reader.
 

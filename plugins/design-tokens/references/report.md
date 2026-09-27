@@ -24,7 +24,7 @@ The audit never deletes an older report, because comparing two reports is how a 
 | `tool` | `{ "name": "design-tokens", "version": "<plugin.json version>" }` |
 | `project` | `{ "name", "root", "commit", "dirty" }`; `commit` is the short hash when the project is a git repository, and `dirty` is true when `git status --porcelain` lists changes, so the report says it audited uncommitted work |
 | `date` | ISO date of the audit |
-| `stack` | `profile` (`"terrazzo-tailwind-v4"` or `null`), `tokenFormat`, `styling`, `rulesDocument`, `tokenSettings` (the resolver path and group names the checks used, when they differ from `conventions.md`), and `versions`: per tool, `installed` and, when checked, `latest` |
+| `stack` | `profile` (`"terrazzo-tailwind-v4"` or `null`), `targetProfile` (when `profile` is `null` and the recommended gates use a profile's assets, that profile, so the header does not say "none" beside Terrazzo gates), `tokenFormat`, `styling`, `rulesDocument`, `tokenSettings` (the resolver path and group names the checks used, when they differ from `conventions.md`), and `versions`: per tool, `installed` and `latest`. Every listed package has its `latest` from the registry (`sources.md`); `render-report.mjs` warns about one without it |
 | `parts` | The four parts (`naming`, `tiers`, `format`, `docs`), each with `status` and a one-sentence `summary` |
 | `findings` | See below |
 | `gates` | See below |
@@ -34,13 +34,13 @@ The audit never deletes an older report, because comparing two reports is how a 
 
 ```json
 {
-  "id": "tiers/role-aliases-palette@tokens/themes/dark.tokens.json#color.surface-overlay",
+  "id": "tiers/role-aliases-palette@tokens/themes/dark.tokens.json#colors.surface-overlay",
   "ruleId": "tiers/role-aliases-palette",
   "part": "tiers",
   "severity": "error",
-  "title": "color.surface-overlay aliases color.surface-container instead of the palette",
-  "location": { "file": "tokens/themes/dark.tokens.json", "pointer": "color.surface-overlay" },
-  "evidence": [{ "file": "tokens/themes/dark.tokens.json", "line": 41, "excerpt": "\"$value\": \"{color.surface-container}\"" }],
+  "title": "colors.surface-overlay aliases colors.surface-container instead of the palette",
+  "location": { "file": "tokens/themes/dark.tokens.json", "pointer": "colors.surface-overlay" },
+  "evidence": [{ "file": "tokens/themes/dark.tokens.json", "line": 41, "excerpt": "\"$value\": \"{colors.surface-container}\"" }],
   "why": "A role that points to a role hides the palette entry behind it (principles 2).",
   "source": "https://www.designtokens.org/faq/",
   "fix": "Point it at the palette entry, or record it as a derived role with its rule."
