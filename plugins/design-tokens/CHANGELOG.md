@@ -7,6 +7,10 @@ A version bump means:
 - **Minor:** a new rule, gate, profile or skill.
 - **Patch:** a fix or a clarification.
 
+## 0.5.2
+
+- **Migration note corrected.** The 0.5.0 note asked to copy only `dtcg.mjs`, but the `colors` default lives in `lib/project-modules.mjs`. A project that followed it and removed `tokens.roles` had `check-tokens` look for `color` and check no role. It failed loudly, as it should (`config: no tokens in the roles group color`). The note now says to copy the whole checks set.
+
 ## 0.5.1
 
 - **`check-after-bash` is removed.** It read the files a shell command changed from Claude Code's `tool_response.bashEditDiff`. By default Claude Code records that list only when its Bash tool handles file edits, not when an agent that has the Edit tool runs `sed` on its own: many shell edits in an auto-mode session carried no list. Turning it on everywhere takes a setting that only a person's own or managed settings can set (`bashEditDiffEnabled`), never a project's. So in a typical project the hook received nothing, while every project copied it. A shell edit is still caught by the commit gate (`guard-commit`, pre-commit, CI); the harness skill and README now say so. `gates.mjs` keeps `editProblems`, which `check-on-edit` uses.
@@ -29,7 +33,7 @@ What the first harness on a real project and the second audit taught.
 **Migrating from 0.4.0**
 - A project whose roles group is `color`: set `tokens.roles` and `tokens.readable` in `design-system/gates.json`, or move with the procedure above.
 - Copy `check-after-bash.mjs` and the new `gates.mjs` to `.claude/hooks/design-tokens/`, and merge the `PostToolUse` `Bash` entry of `assets/harness/core/settings.hooks.json`.
-- Copy the new `checks/lib/dtcg.mjs` to `design-system/checks/lib/`.
+- Copy the whole checks set again, so `design-system/checks/` matches the plugin: `scripts/check-tokens.mjs`, `scripts/check-rules-contract.mjs` and `scripts/lib/*.mjs`. The `colors` default lives in `lib/project-modules.mjs`: with only `dtcg.mjs` copied (as this note said until 0.5.2), removing `tokens.roles` makes the check look for `color` and check no role.
 
 ## 0.4.0
 
