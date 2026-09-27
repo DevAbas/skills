@@ -1,5 +1,0 @@
-{
-  "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
-  "$description": "Colour roles, for an interface with one context: each an alias into the palette, or derived by a recorded rule. With two or more contexts the roles go in themes/<context>.tokens.json instead.",
-  "colors": { "$type": "color" }
-}

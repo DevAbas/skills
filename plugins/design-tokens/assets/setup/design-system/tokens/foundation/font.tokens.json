@@ -1,8 +1,0 @@
-{
-  "$schema": "https://www.designtokens.org/schemas/2025.10/format.json",
-  "$description": "Font families and weights. Text styles alias these; code never reads them directly.",
-  "font": {
-    "family": { "$type": "fontFamily" },
-    "weight": { "$type": "fontWeight" }
-  }
-}
