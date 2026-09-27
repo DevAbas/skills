@@ -85,10 +85,9 @@ While a skill of this plugin is in use, a hook keeps its searches inside the pro
 |---|---|---|
 | `protect-generated` | Before an Edit or Write | Denies an edit to a generated output |
 | `check-on-edit` | After an Edit or Write | Lints the file, or runs the token checks after a token or rules edit, and reports a failure to the agent |
-| `check-after-bash` | After a Bash command | The same checks on the files the command changed, from Claude Code's changed-file list (v2.1.269 or later; in modes other than auto, only when your own settings set `bashEditDiffEnabled`) |
 | `guard-commit` | Before an agent's `git commit` | Runs the commit gates and refuses the commit when one fails |
 
-A hook that runs after the tool reports; it cannot undo the write. The commit gates, for an agent, a person and CI, are what enforce.
+A hook that runs after the tool reports; it cannot undo the write. A file changed through the shell (`sed`, a heredoc) reaches no edit hook. The commit gates, for an agent, a person and CI, catch both, and are what enforce.
 
 ## The rubric
 

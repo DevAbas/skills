@@ -34,17 +34,6 @@
             "statusMessage": "Design-token checks on the edited file…"
           }
         ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/design-tokens/with-node.sh check-after-bash.mjs",
-            "timeout": 120,
-            "statusMessage": "Design-token checks on the files the command changed…"
-          }
-        ]
       }
     ]
   }

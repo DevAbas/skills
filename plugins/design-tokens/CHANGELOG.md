@@ -7,6 +7,12 @@ A version bump means:
 - **Minor:** a new rule, gate, profile or skill.
 - **Patch:** a fix or a clarification.
 
+## 0.5.1
+
+- **`check-after-bash` is removed.** It read the files a shell command changed from Claude Code's `tool_response.bashEditDiff`. By default Claude Code records that list only when its Bash tool handles file edits, not when an agent that has the Edit tool runs `sed` on its own: many shell edits in an auto-mode session carried no list. Turning it on everywhere takes a setting that only a person's own or managed settings can set (`bashEditDiffEnabled`), never a project's. So in a typical project the hook received nothing, while every project copied it. A shell edit is still caught by the commit gate (`guard-commit`, pre-commit, CI); the harness skill and README now say so. `gates.mjs` keeps `editProblems`, which `check-on-edit` uses.
+
+**Migrating from 0.5.0:** a project that copied `check-after-bash.mjs` deletes it from `.claude/hooks/design-tokens/`, and removes the `PostToolUse` `Bash` entry from `.claude/settings.json`.
+
 ## 0.5.0
 
 What the first harness on a real project and the second audit taught.

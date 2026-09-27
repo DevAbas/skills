@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { bashChangedFiles, editProblems, editedFile, gatesProblems, globToRegExp, isGitCommit, matchesAny } from "../gates.mjs";
+import { editProblems, editedFile, gatesProblems, globToRegExp, isGitCommit, matchesAny } from "../gates.mjs";
 
 describe("globToRegExp", () => {
   it("lets ** span folders, including none", () => {
@@ -60,21 +60,6 @@ describe("editedFile", () => {
   it("makes the tool's path relative to the root", () => {
     assert.equal(editedFile({ tool_input: { file_path: "/repo/src/a.tsx" } }, "/repo"), "src/a.tsx");
     assert.equal(editedFile({ tool_input: {} }, "/repo"), undefined);
-  });
-});
-
-describe("bashChangedFiles", () => {
-  const input = (bashEditDiff) => ({ tool_name: "Bash", tool_input: { command: "sed -i '' s/a/b/ src/a.tsx" }, tool_response: { stdout: "", bashEditDiff } });
-
-  it("reads Claude Code's changed-file list relative to the root, once each", () => {
-    assert.deepEqual(bashChangedFiles(input({ changedFiles: ["/repo/src/a.tsx", "/repo/DESIGN.md", "/repo/src/a.tsx"], files: [], moreFiles: 0 }), "/repo"), ["src/a.tsx", "DESIGN.md"]);
-  });
-
-  it("gives nothing without a list, for a skipped diff, or for a path outside the root", () => {
-    assert.deepEqual(bashChangedFiles({ tool_response: { stdout: "" } }, "/repo"), []);
-    assert.deepEqual(bashChangedFiles(input({ skipped: true, changedFiles: ["/repo/src/a.tsx"] }), "/repo"), []);
-    assert.deepEqual(bashChangedFiles(input({ changedFiles: ["/elsewhere/x.tsx", "/repo", 7, ""] }), "/repo"), []);
-    assert.deepEqual(bashChangedFiles({}, "/repo"), []);
   });
 });
 

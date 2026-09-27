@@ -11,7 +11,7 @@
 
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 
 export const CONFIG_FILES = ["design-system/gates.json", "design-tokens.gates.json"];
 export const CONFIG_FILE = CONFIG_FILES[0];
@@ -95,30 +95,11 @@ export function hookInput() {
   return raw ? JSON.parse(raw) : {};
 }
 
-/** `file` relative to `root`, forward slashes; undefined when it is outside the root. */
-function projectPath(file, root) {
-  const path = relative(root, resolve(root, file)).split("\\").join("/");
-  return path && path !== ".." && !path.startsWith("../") && !isAbsolute(path) ? path : undefined;
-}
-
 /** The edited file relative to `root`, forward slashes; undefined when the tool call has none. */
 export function editedFile(input, root = process.cwd()) {
   const file = input?.tool_input?.file_path;
   if (typeof file !== "string" || !file) return undefined;
   return relative(root, resolve(root, file)).split("\\").join("/");
-}
-
-/**
- * The files a Bash command changed, relative to `root`: Claude Code's `tool_response.bashEditDiff.changedFiles`
- * (https://code.claude.com/docs/en/hooks, Bash; v2.1.269 or later, public beta). Empty when the input has no
- * diff (recording is off, or the command ran in the background) or the diff was skipped (a command that moves
- * the working tree, such as `git checkout`). Files outside the root are left out.
- */
-export function bashChangedFiles(input, root = process.cwd()) {
-  const diff = input?.tool_response?.bashEditDiff;
-  if (!diff || diff.skipped || !Array.isArray(diff.changedFiles)) return [];
-  const files = diff.changedFiles.filter((file) => typeof file === "string" && file).map((file) => projectPath(file, root));
-  return [...new Set(files.filter((file) => file !== undefined))];
 }
 
 /**
